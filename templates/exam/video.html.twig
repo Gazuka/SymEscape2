@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Salles d'exam{% endblock %}
+
+{% block body %}
+    <video id="video" controls>
+        <source src="{{ asset('exam/videos/'~ video ~'.mp4') }}" type="video/mp4">        
+        <p>Votre navigateur ne prend pas en charge les vidéos HTML5.
+    </video>
+
+    <script type="text/javascript">
+            
+            //Permet d'activer le son (bloqué par défaut sur chrome)
+            function activeSon(video)
+            {
+                video.muted = false;
+            }
+
+            //Lancement de la vidéo
+            function startVideo()
+            {
+                var video = document.getElementById('video');
+                video.muted = "muted";
+                video.play();
+                setTimeout(activeSon, 1000);
+                video.onended = function()
+                {
+                    //Rechargement de la page à la fin de la vidéo
+                    var url = "{{ path('game', {'id' : game.id}) }}";
+                    document.location.href=url;
+                }
+            }
+
+            //Lancement du script
+            window.onload = function() 
+            {
+                startVideo();
+            }            
+
+    </script>
+{% endblock %}

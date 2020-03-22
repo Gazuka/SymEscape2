@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    
+{% endblock %}
+
+{% block meta %}
+    <meta http-equiv="refresh" content="30;url={{ path('game', {'id' : game.id}) }}" />
+{% endblock %}
+
+{% block title %}Lancement de l'exam en attente{% endblock %}
+
+{% block body %}
+    <a href="{{ path('game_start', {'id' : game.id}) }}">Débuter la partie</a>
+{% endblock %}
+
+

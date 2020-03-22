@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    
+{% endblock %}
+
+{% block meta %}
+    <meta http-equiv="refresh" content="30;url={{ path('game', {'id' : game.id}) }}" />
+{% endblock %}
+
+{% block title %}Exam en cours{% endblock %}
+
+{% block body %}
+    Examen en cours
+    <div id="horloge"></div>
+    
+    <script type="text/javascript">
+        
+        //Affichage de l'horloge + relance de la fonction tic tac toute les secondes
+        function horloge(duree, minutes, secondes)
+        {
+            //Récupération du div de l'horloge
+            var horloge = document.getElementById("horloge");
+            //Mise en forme de l'horloge
+            minutes = (minutes < 10 ? "0" : "") + minutes;
+            secondes = (secondes < 10 ? "0" : "") + secondes;
+            //Affichage de l'horloge
+            horloge.innerHTML = minutes + ":" + secondes;
+            setTimeout("tictac("+(duree+1)+");", 1000);
+        }    
+
+        //Calcul les minutes et secondes
+        function tictac(duree)
+        {
+            var minutes = Math.trunc(duree / 60);
+            var secondes = Math.trunc(duree - (minutes * 60));
+            horloge(duree, minutes, secondes);
+        } 
+
+        //Lancement du script
+        window.onload = function() 
+        {
+            tictac({{ duree }});                
+        }
+
+    </script>
+{% endblock %}
+
+

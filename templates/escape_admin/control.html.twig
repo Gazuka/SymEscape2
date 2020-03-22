@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('admin/css/admin.css') }}"/>
+{% endblock %}
+
+{% block title %}Escape Game - Exam - Admin{% endblock %}
+
+{% block body %}
+    <h1>Partie : {{ game.id }}</h1>
+     {% for nextTrigg in nextTriggs %}
+        {% if nextTrigg.etat == false %}
+            <div class="icontrigg">
+                <a href={{ path('exam_admin_control_trigg', {'id' : nextTrigg.id, 'gameId' : game.id}) }}>
+                    <div class="icontrigg_1">
+                        {{ nextTrigg.titre }}
+                    </div>
+                    <div class="icontrigg_2">
+                        {{ nextTrigg.descriptif }}
+                    </div>
+                </a>
+            </div>
+        {% endif %}
+     {% endfor %}   
+        
+{% endblock %}

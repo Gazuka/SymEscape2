@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Salles d'exam{% endblock %}
+
+{% block body %}
+    Liste des salles d'exam :
+    {% for game in games %}
+        <div>
+            <a href="{{ path('game', {'id' : game.id}) }}">{{ game.id }}</a>
+        </div>
+    {% endfor %}
+{% endblock %}

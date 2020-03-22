@@ -1,0 +1,360 @@
+<?php
+
+namespace App\Controller;
+
+use DateTime;
+use DateInterval;
+use App\Form\ScanType;
+use App\Repository\FilRepository;
+use App\Repository\GameRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+//Nombre de minutes entre le début de la partie et le déclenchement de la bombe
+define("MINUTES_INTRO", "1");
+
+class ExamController extends AbstractController
+{
+    /**
+     * @Route("/exam", name="exam")
+     * 
+     * Affiche la liste des parties
+     */
+    public function index(GameRepository $repo)
+    {
+        $games = $repo->findAll();
+        
+        return $this->render('exam/index.html.twig', [
+            'games' => $games,
+        ]);
+    }
+
+    /**
+     * @Route("/exam/game/{id}", name="game")
+     */
+    public function game($id, GameRepository $repo, Request $request, EntityManagerInterface $manager)
+    {
+        //Création d'un formulaire pour l'utilisation du scanner
+        $form = $this->createForm(ScanType::class);        
+        $form->handleRequest($request);
+        
+        //Récupération de la partie en cours
+        $game = $repo->find($id);
+
+        //Gestion du temps
+        $SecondesDeJeu = $game->calculDureeDeJeu();
+       
+        /*******************************************/
+        /* --- AVANT LE LANCEMENT DE LA PARTIE --- */
+        /*******************************************/
+
+        //Si la partie n'est pas démarré
+        if($this->trigger($game, "StartGame") != true)
+        {
+            //Affichage de la page de lancement de la partie
+            return $this->render('exam/pregame.html.twig', [
+                'game' => $game              
+            ]);
+        }
+
+        /*******************************************/
+        /* --- AVANT L'INTRO ---                   */
+        /*******************************************/
+
+        //Si l'intro n'est pas encore lu
+        if($this->trigger($game, "VisionageIntro") != true)
+        {
+            //Si durée de jeu >= MINUTES_INTRO alors on lance l'intro
+            if($SecondesDeJeu >= MINUTES_INTRO * 60)
+            {
+                //Changement du trigg sur true
+                $this->triggOn($game, "VisionageIntro");
+                //Lancement de la vidéo d'intro
+                return $this->video($game, "intro");
+
+            }
+            //Sinon on affiche l'horloge classique
+            else
+            {
+                //affichage de l'horloge
+                return $this->render('exam/horloge.html.twig', [
+                    'game' => $game,
+                    'duree' => $SecondesDeJeu
+                ]);
+            }
+        }
+
+        /*******************************************/
+        /* --- PARTIE EN COURS ---                 */
+        /*******************************************/
+
+
+        /*******************************************/
+        /* --- FIN DE SCRIPT ---                   */
+        /*******************************************/
+        
+        //Sauvegarde de la partie
+        $manager->persist($game);
+        $manager->flush();
+
+        $now = new DateTime(); //A supprimer à terme
+
+        //Affichage de la page
+        return $this->render('exam/game.html.twig', [
+            'form' => $form->createView(),
+            'game' => $game,
+            'datenow' => $now,
+            'minstartgame' => $SecondesDeJeu / 60,
+            'minutes' => 30, // A gérer
+            'secondes' => 30, // A gérer
+        ]);
+    }
+
+    /**
+     * @Route("/exam/game/{id}/start", name="game_start")
+     */
+    public function gameStart($id, GameRepository $repo, EntityManagerInterface $manager)
+    {
+        $game = $repo->find($id);
+        $game->Debuter();
+        $this->triggOn($game, "StartGame");
+        $manager->persist($game);
+        $manager->flush();
+        return $this->redirectToRoute('game', ['id' => $game->getId()]);
+    }
+
+
+    /**
+     * Vérifie l'état d'un trigg et retour true or false
+     */
+    private function trigger($game, $titre)
+    {
+        foreach($game->getScenario()->getTriggs() as $trigg)
+        {
+            if($trigg->getTitre() == $titre)
+            {
+                return $trigg->getEtat();
+            }
+        }
+        return null;        
+    }
+
+    /**
+     * Active un trigg
+     */
+    private function triggOn($game, $titre)
+    {
+        foreach($game->getScenario()->getTriggs() as $trigg)
+        {
+            if($trigg->getTitre() == $titre)
+            {
+                $trigg->setEtat(true);
+            }
+        }
+    }
+
+    /**
+     * Affiche une video
+     */
+    private function video($game, $video)
+    {
+        return $this->render('exam/video.html.twig', [
+            'game' => $game,
+            'video' => $video
+        ]);
+    }
+
+    
+
+    /**
+     * @Route("/exam/gagne/{id}", name="gagne")
+     */
+    public function gagne(GameRepository $repo, $id)
+    {
+        $game = $repo->find($id);
+        
+        return $this->render('exam/gagne.html.twig', [
+            'game' => $game,
+        ]);
+    }
+
+    /**
+     * @Route("/exam/perdu/{id}", name="perdu")
+     */
+    public function perdu(GameRepository $repo, $id)
+    {
+        $game = $repo->find($id);
+        
+        return $this->render('exam/perdu.html.twig', [
+            'game' => $game,
+        ]);
+    }
+
+    /**
+     * @Route("/exam/fini/{id}/{message}", name="fini")
+     */
+    public function fini(GameRepository $repo, $id, $message)
+    {
+        $game = $repo->find($id);
+        
+        return $this->render('exam/fini.html.twig', [
+            'game' => $game,
+            'message' => $message,
+        ]);
+    }
+
+    
+    /**
+     * @Route("/exam/game2/{id}/{action}/{coupe}", name="game2")
+     */
+    public function game2($id, GameRepository $repo, Request $request, EntityManagerInterface $manager, $coupe = null, FilRepository $repoFil, $action = null)
+    {
+        $form = $this->createForm(ScanType::class);        
+        $form->handleRequest($request);
+        
+        $game = $repo->find($id);
+        
+
+        //Gestion du tps
+        $now = new DateTime();
+        //Calcul le nombre de minutes depuis le début de la partie
+        if($game->getStart() != null)
+        {
+            $diffstartgame = $game->getStart()->diff($now);
+            $minStartGame = $diffstartgame->format('%i');
+        }
+        else
+        {
+            $minStartGame = null;
+        }
+
+        //GESTION DES ACTIONS
+        switch($action)
+        {
+            case null:
+            break;
+            case 'startgame':
+                //debut de la partie
+                if($game->getStart() == null)
+                {
+                    $now->format('Y-m-d H:i:s');
+                    $game->setStart($now);      
+                }
+            break;
+            case 'fin_intro':
+                //L'intro est fini
+                if($game->getBombe()->getStart() == null)
+                {
+                    $now->format('Y-m-d H:i:s');
+                    $game->getBombe()->setStart($now);      
+                }
+            break;
+            case 'fin_gagne':
+                //La partie est gagnée 
+                return $this->redirectToRoute('fini', ['id' => $game->getId(), 'message' => 'Bravo']);               
+            break;
+            case 'fin_perdu':
+                //La partie est perdu    
+                return $this->redirectToRoute('fini', ['id' => $game->getId(), 'message' => 'Perdu']);               
+            break;
+        }
+
+        //Affichage de l'intro ?
+        if($minStartGame >= 1 && $game->getBombe()->getStart() == null) // 1 minute avant l'intro
+        {
+            return $this->redirectToRoute('video', ['id' => $game->getId()]);
+        }
+        
+        if($game->getBombe()->getStart() != null)
+        {
+            $chrono = $game->getBombe()->getStart()->diff($now);
+            $minutes = $chrono->format('%I');
+            $secondes = $chrono->format('%S');             
+        }
+        else
+        {
+            $minutes = null;
+            $secondes = null; 
+        }
+
+        if($game->getBombe()->getStart() != null)
+        {
+            $fin = $game->getBombe()->getStart()->add(new DateInterval('PT1H'));//Probleme avec heure du serveur ?
+            //$fin = $game->getBombe()->getStart();
+            //dump("debut bombe: ".$game->getBombe()->getStart());
+            dump($fin);
+            //dump($now->add(new DateInterval('PT1H')));
+
+            if($now > $fin)
+            {
+                dump("perdu");
+                //perdu
+                return $this->redirectToRoute('perdu', ['id' => $game->getId()]);
+            }
+            else
+            {
+                dump("encours");
+                dump($now);
+            }
+        }
+        
+        
+
+        //On vérifie que le formulaire soit Soumis et valide
+        if($form->isSubmitted() && $form->isValid()) 
+        {
+            $scan = $form['scan']->getData();
+            if($scan == "020312" || $scan == "020310")
+            {
+                $game->getBombe()->devisser();
+                dump("devisser");
+            }
+            if($scan == "020311" || $scan == "020309")
+            {
+                $game->getBombe()->setPince(1);
+            }            
+        }
+
+        //Lorsqu'un fil est coupé
+        if($coupe != null)
+        {
+            //dd(sizeof($game->getBombe()->FilsRestants()));
+            if(sizeof($game->getBombe()->FilsRestants()) != 2)
+            {
+                //Un fil a été coupé !
+                if($coupe == $game->getBombe()->filACouper())
+                {
+                    $fil = $repoFil->find($coupe);
+                    $fil->setEtat(0);
+                    $manager->persist($fil);            
+                }
+                else
+                {
+                    //Perdu
+                    return $this->redirectToRoute('perdu', ['id' => $game->getId()]);
+                }
+            }
+            else
+            {
+                //Gagné
+                //dd(sizeof($game->getBombe()->FilsRestants()));
+                return $this->redirectToRoute('gagne', ['id' => $game->getId()]);
+            }
+        }
+
+        $manager->persist($game);
+        $manager->flush();
+
+        //dump($game->getBombe()->filACouper());
+        return $this->render('exam/game.html.twig', [
+            'form' => $form->createView(),
+            'game' => $game,
+            'datenow' => $now,
+            'minstartgame' => $minStartGame,
+            'minutes' => $minutes,
+            'secondes' => $secondes,
+        ]);
+    }
+}

@@ -1,0 +1,18 @@
+{% extends '_base.html.twig' %}
+
+{% block title %}{{ parent() }} Admin{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xl">   
+                {% include 'escape_admin/_menu.html.twig' %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl">
+                {% block content %}{% endblock %}
+            </div>
+        </div>    
+    </div>
+{% endblock %}

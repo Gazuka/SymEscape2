@@ -1,0 +1,264 @@
+body {
+    text-align : center;
+    background:black;
+    color:white;
+    margin: 0px;
+    padding: 0px;
+    border: 1px solid black;
+
+    /*cursor: crosshair; */
+    /*cursor: wait;   */
+    /* interdit */
+    
+}
+
+
+#scan
+{
+    color: black;
+    background-color: black;
+}
+#scan input
+{
+    color: black;
+    background-color: black;
+    border: 0px;
+    width: 10px;
+}
+
+#scan:focus
+{
+    background-color: black;
+    border: 10px solid black;    
+}
+
+.bombe
+{
+    margin-left: 310px;
+    background-color: red;
+    width: 100%;
+    color:red;
+    font-family: 'Oxygen Mono', monospace;
+    font-size: 180px;     
+}
+
+.zone1
+{
+    float:left;
+    width:2000px;
+    height:178px;
+    background-image:url('images/bombe_02.jpg');    
+}
+
+.zone2
+{
+    float:left;
+    width:699px;
+    height:392px;
+    background-image:url('images/bombe_03.jpg');
+}
+
+.zone3
+{
+    float:left;
+    width:533px;
+}
+
+.zone4
+{
+    float:left;
+    width:533px;
+    height:221px;
+    background-image:url('images/bombe_04.jpg');
+}
+
+.zone5
+{
+    float:left;
+    width:533px;
+    height:171px;
+    background-image:url('images/bombe_06.jpg');
+}
+
+.zone6
+{
+    float:left;
+    width:768px;
+    height:392px;
+    background-image:url('images/bombe_05.jpg');
+}
+
+.back1
+{
+    float:left;
+    width:100%;
+    height:150px;
+    background-image:url('images/back_1.jpg');    
+}
+
+.back2
+{
+    float:left;
+    width:100%;
+    height:130px;
+    background-image:url('images/back_2.jpg');    
+    margin-top: 30px;
+}
+
+.back3
+{
+    float:left;
+    width:100%;
+    height:500px;
+    background-image:url('images/back_3.jpg');    
+}
+
+.back4
+{
+    position: relative;
+    margin: auto;
+    width:1200px;
+    height:450px;
+    background-image:url('images/back_4.jpg');      
+}
+
+.back5
+{
+    position: relative;
+    margin: auto;
+    width:1200px;
+    height:450px;
+    background-image:url('images/back_5.jpg');   
+}
+
+.fils
+{
+    float: left;
+    margin-left: 220px;
+    margin-top: 20px;
+}
+.fil
+{
+    float: left;
+    width: 85px;
+    height: 410px;
+    margin-right: 50px;        
+}
+.fil_coupe
+{
+    float: left;
+    width: 85px;
+    height: 410px;
+    margin-right: 50px;
+}
+.fil_rouge
+{
+    background-image:url('images/fil_rouge.jpg');    
+}
+.fil_bleu
+{
+    background-image:url('images/fil_bleu.jpg');  
+}
+.fil_jaune
+{
+    background-image:url('images/fil_jaune.jpg');  
+}
+.fil_blanc
+{
+    background-image:url('images/fil_blanc.jpg');  
+}
+.fil_noir
+{
+    background-image:url('images/fil_noir.jpg');  
+}
+.fil_coupe_rouge
+{
+    background-image:url('images/fil_coupe_rouge.jpg');    
+}
+.fil_coupe_bleu
+{
+    background-image:url('images/fil_coupe_bleu.jpg');  
+}
+.fil_coupe_jaune
+{
+    background-image:url('images/fil_coupe_jaune.jpg');  
+}
+.fil_coupe_blanc
+{
+    background-image:url('images/fil_coupe_blanc.jpg');  
+}
+.fil_coupe_noir
+{
+    background-image:url('images/fil_coupe_noir.jpg');  
+}
+.fil_interdit
+{
+    cursor: not-allowed;     
+}
+.fil_autorise
+{
+    cursor: grab;     
+}
+/*
+.fil_interdit:hover
+{
+    cursor: not-allowed; 
+    
+}*/
+.vis1
+{
+    margin: auto;
+    float: left;
+    margin-top: 50px;
+    margin-left: 50px;
+    width:100px;
+    height:90px;    
+    background-image:url('images/vis_2.png');  
+}
+
+.vis2
+{
+    margin: auto;
+    float: right;
+    margin-top: 50px;
+    margin-right: 50px;
+    width:100px;
+    height:90px;    
+    background-image:url('images/vis_2.png');
+}
+
+.vis3
+{
+    margin: auto;
+    float: left;
+    margin-top: 300px;
+    margin-left: -100px;
+    width:100px;
+    height:90px;    
+    background-image:url('images/vis_2.png');
+}
+
+.vis4
+{
+    margin: auto;
+    float: right;
+    margin-top: 300px;
+    margin-right: -100px;
+    width:100px;
+    height:90px;    
+    background-image:url('images/vis_2.png');
+}
+
+.visOn
+{
+    background-image:url('images/vis_1.png');  
+}
+
+.basefils
+{
+    float:left;
+    width:100%;
+    height:800px;
+    background-size: 3000px;
+    background-image:url('images/back.jpg');
+}

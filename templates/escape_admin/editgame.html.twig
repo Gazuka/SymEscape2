@@ -1,0 +1,88 @@
+{% extends 'escape_admin/_base.html.twig' %}
+
+{% block title %}{{ parent() }} / Création d'une partie{% endblock %}
+
+{% form_theme form _self %}
+
+{% block content %}
+    <h1>{{ titre }}</h1>
+
+        {{ form_start(form) }}
+        {% for objet in element.objetsScenario %}
+            {% if objet.bombe != null %}
+                Durée de la bombe (en minutes) :
+                {{ form_widget(form.duree, {value: objet.bombe.duration / 60}) }}
+            {% endif %}
+        {% endfor %}
+        {{ form_widget(form) }}
+        
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+
+        {{ form_end(form) }}        
+    </div>
+{% endblock %}
+
+{# GESTION DES JOUEURS ################################################################################################################################################}
+{% block _game_edit_joueurs_widget %}
+    
+    {{ form_widget(form) }}
+
+<input type="hidden" id="widgets-counter" value="0">
+
+    <div class="form-group">
+        <button type="button" id="add-joueur" class="btn btn-primary">Ajouter un joueur</button>
+    </div>
+{% endblock %}
+
+{% block _game_edit_joueurs_entry_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block _game_edit_joueurs_entry_widget %}
+    <div class="form-group" id="block_{{id}}">
+        <div class="card p-3">
+            <div class="row">
+                <div class="col-11">
+                    {{ form_widget(form) }}
+                </div>                
+                <div class="col-1">
+                    <button type="button" data-action="delete" data-target="#block_{{id}}" class="btn btn-danger">X</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{# GESTION DES JAVASCRIPTS ###################################################################################################################################################}
+{% block javascripts %}
+    <script>
+        {# etapes recette #}
+        $('#add-joueur').click(function()
+        {
+            // Je récupère le numéro des futurs champs à créer
+            var index = +$('#widgets-counter').val();
+            if(index==0)
+            {
+                index = $('#game_edit_joueurs div.form-group').length;
+                $('#widgets-counter').val(index);
+            }       
+            // Je récupère le prototype des entrées
+            const tmpl = $('#game_edit_joueurs').data('prototype').replace(/__name__/g, index);
+            // J'injecte ce code au sein de la div
+            $('#game_edit_joueurs').append(tmpl);
+            $('#widgets-counter').val(index + 1);
+            // Je gère le bouton supprimer
+            handleDeleteButtons();
+        });
+
+        function handleDeleteButtons() {
+            $('button[data-action="delete"]').click(function(){
+                const target = this.dataset.target;
+                $(target).remove();
+            });
+        }
+
+        handleDeleteButtons();
+    </script>
+{% endblock %}

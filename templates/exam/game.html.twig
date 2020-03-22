@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('bombe/style.css') }}"/>
+    <link href="https://fonts.googleapis.com/css?family=Oxygen+Mono&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block meta %}
+    <meta http-equiv="refresh" content="30;url={{ path('game', {'id' : game.id}) }}" />
+    
+{% endblock %}
+
+{% block title %}Exam en cours{% endblock %}
+
+{% block body %}
+    <div class="back1">
+        &nbsp;   
+    </div>
+    <div id="bombe" class="bombe">
+        <div class="zone1">&nbsp;</div>
+        <div class="zone2">&nbsp;</div>            
+        <div class="zone3">
+            <div class="zone4" id="compte_a_rebours">90:00</div>
+            <div class="zone5">&nbsp;</div>
+        </div>
+        <div class="zone6">&nbsp;</div>
+    </div>
+    <div class="back2">&nbsp;</div>
+    <div class="back3">
+        {% if game.bombe.visRestantes > 0 %}
+            {# couvercle de bombe #}
+            <div class="back5">
+                <div class="vis1 {% if game.bombe.visRestantes > 0 %}visOn{% endif %}">&nbsp;</div>
+                <div class="vis2 {% if game.bombe.visRestantes > 1 %}visOn{% endif %}">&nbsp;</div>
+                <div class="vis3 {% if game.bombe.visRestantes > 2 %}visOn{% endif %}">&nbsp;</div>
+                <div class="vis4 {% if game.bombe.visRestantes > 3 %}visOn{% endif %}">&nbsp;</div>
+            </div>
+        {% else %}
+            {# plus de couvercle de bombe #}
+            <div class="back4">
+                <div class="fils">
+                    {% for fil in game.bombe.fils %}
+                        {% if game.bombe.pince == 1 %}
+                            {% if fil.etat == 1 %}
+                                <a class="fil_autorise" href="{{ path('game_cut', {'id' : game.id, 'cutId' : fil.id}) }}"><div class="fil fil_{{ fil.couleur }}"></div></a>
+                            {% else %}
+                                <div class="fil_coupe fil_coupe_{{ fil.couleur }}"></div>
+                            {% endif %}
+                        {% else %}
+                            <a class="fil_interdit"><div class="fil fil_{{ fil.couleur }}">&nbsp;</div></a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% if game.bombe.pince %}
+        <img src="{{ asset('bombe/images/pince.jpg') }}"/>
+    {% endif %}
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}    
+    {{ form_end(form) }}            
+
+    <script type="text/javascript">
+        
+        //Affichage de l'horloge + relance de la fonction tic tac toute les secondes
+        function minuteur(duree, minutes, secondes)
+        {
+            //Récupération du div de la bombe
+            var minuteur = document.getElementById("compte_a_rebours");
+
+            //Mise en forme du minuteur
+            minutes = (minutes < 10 ? "0" : "") + minutes;
+            secondes = (secondes < 10 ? "0" : "") + secondes;
+
+            //Affichage du minuteur
+            minuteur.innerHTML = minutes + ":" + secondes;
+            setTimeout("tictac("+(duree-1)+");", 1000);
+        }    
+
+        //Calcul les minutes et secondes
+        function tictac(duree)
+        {
+            var minutes = Math.trunc(duree / 60);
+            var secondes = Math.trunc(duree - (minutes * 60));
+            minuteur(duree, minutes, secondes);
+        } 
+
+        //Lancement du script
+        window.onload = function() 
+        {
+            //Met le focus sur le lecteur de code barre
+            document.getElementById('scan_scan').focus();
+            document.getElementById('scan_scan').value = '';
+
+            //Débute le compte à rebour
+            tictac({{ dureebombe }});          
+        } 
+    
+    </script>
+
+{% endblock %}

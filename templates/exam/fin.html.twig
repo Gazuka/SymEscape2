@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('bombe/style.css') }}"/>
+    <link href="https://fonts.googleapis.com/css?family=Oxygen+Mono&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block meta %}
+    
+{% endblock %}
+
+{% block title %}Exam fini{% endblock %}
+
+{% block body %}
+    <p>La partie est fini</p>
+    {% for trigg in game.scenario.triggs %}
+        {% if trigg.titre == "DesamorcageReussi" and trigg.etat == true %}
+            <h1>Félicitation, vous avez réussi à désamorcer la bombe !</h1>        
+        {% endif %}
+        {% if trigg.titre == "DesamorcageRate" and trigg.etat == true %}
+            <h1>Vous avez coupé le mauvais fil...</h1>        
+        {% endif %}
+        {% if trigg.titre == "Boum" and trigg.etat == true %}
+            <h1>Vous avez mis trop de temps, la bombe a explosé.</h1>        
+        {% endif %}
+    {% endfor %}
+
+{% endblock %}
