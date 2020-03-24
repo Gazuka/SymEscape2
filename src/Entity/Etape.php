@@ -198,4 +198,22 @@ class Etape
 
         return $this;
     }
+
+    /**
+     * Retourne true si tous les parents sont activés
+     *
+     * @return void
+     */
+    public function verifParents()
+    {
+        $deblocable = true;
+        foreach($this->parents as $parent)
+        {
+            if($parent->getEtat == false)
+            {
+                $deblocable == false;
+            }
+        }
+        return $deblocable;
+    }
 }

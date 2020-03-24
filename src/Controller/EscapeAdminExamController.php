@@ -2,70 +2,42 @@
 
 namespace App\Controller;
 
-use DateTime;
 use App\Entity\Fil;
 use App\Entity\Vis;
-use App\Entity\Game;
 use App\Entity\Bombe;
-use App\Entity\Etape;
-use App\Entity\Trigg;
-use App\Entity\Commut;
-use App\Form\GameType;
 use App\Entity\Scenario;
 use App\Form\GameEditType;
 use App\Entity\ObjetScenario;
+use App\Form\GameEditExamType;
 use App\Repository\GameRepository;
-use App\Repository\TriggRepository;
-use App\Controller\OutilsController;
 use App\Repository\JoueurRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Controller\EscapeAdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ExamAdminController extends OutilsController
+class EscapeAdminExamController extends EscapeAdminController
 {
     //-----------------------------------------------------------------------------------
     //Fonctions avec route ==============================================================
     //-----------------------------------------------------------------------------------
+    
     /**
-     * @Route("/escape/admin", name="escape_admin")
-     * Affiche la page d'accueil de l'espace admin
+     * @Route("/escape/admin/exam/firstinit", name="escape_admin_exam_firstinit")
+     * Page à executer pour l'installation du nouveau scenario
      */
-    public function index(GameRepository $repo, EntityManagerInterface $manager)
+    public function firstinit(EntityManagerInterface $manager)
     {
         //Initialisation des scénario si bdd vide (laisser en commentaire)
-        //$this->CreationScenarioExam($manager);
+        //$this->CreationScenario($manager);
 
-        $games = $repo->findAll();
-        return $this->render('escape_admin/index.html.twig', [
-            'games' => $games,
-        ]);
+        return $this->redirectToRoute('escape_admin');
     }
 
     /**
-     * @Route("/escape/admin/newgame", name="escape_admin_newgame")
-     * Affiche la page de création d'une nouvelle partie
-     */
-    public function creerGame(Request $request, EntityManagerInterface $manager):Response
-    {
-        $variables['request'] = $request;
-        $variables['manager'] = $manager;
-        $variables['element'] = new Game();
-        $variables['classType'] = GameType::class;
-        $variables['pagedebase'] = 'escape_admin/newgame.html.twig';
-        $variables['pagederesultat'] = 'escape_admin';
-        $variables['titre'] = "Création d'une partie";
-        $variables['texteConfirmation'] = "La partie ### a bien été créé !";
-        $options['dependances'] = array('Joueurs' => 'Game', 'Commuts' => 'Game');        
-        $options['texteConfirmationEval'] = ["###" => '$element->getId();'];
-        $options['actions'] = array(['name' => 'action_initScenario', 'params' => []]);
-        return $this->afficherFormulaire($variables, $options);
-    }
-
-    /**
-     * @Route("/escape/admin/edit/{id}", name="escape_admin_edit")
+     * @Route("/escape/admin/exam/edit/{id}", name="escape_admin_exam_edit")
      * Affiche la page de création d'une nouvelle partie
      */
     public function editGame(GameRepository $repo, $id, JoueurRepository $repoJoueur, Request $request, EntityManagerInterface $manager):Response
@@ -75,15 +47,15 @@ class ExamAdminController extends OutilsController
         $variables['request'] = $request;
         $variables['manager'] = $manager;
         $variables['element'] = $game;
-        $variables['classType'] = GameEditType::class;
-        $variables['pagedebase'] = 'escape_admin/editgame.html.twig';
+        $variables['classType'] = GameEditExamType::class;
+        $variables['pagedebase'] = 'escape_admin/exam/editgame.html.twig';
         $variables['pagederesultat'] = 'escape_admin';
         $variables['titre'] = "Edition d'une partie";
         $variables['texteConfirmation'] = "La partie ### a bien été éditée !";
         $options['dependances'] = array('Joueurs' => 'Game');  
         $options['deletes'] = array(['findBy' => 'game', 'classEnfant' => 'joueurs', 'repo' => $repoJoueur]);  
         $options['texteConfirmationEval'] = ["###" => '$element->getId();'];
-        $options['actions'] = ['name' => 'action_editScenario', 'params' => []];
+        $options['actions'] = array(['name' => 'action_editScenario', 'params' => []]);
         return $this->afficherFormulaire($variables, $options);
     }
 
@@ -95,33 +67,11 @@ class ExamAdminController extends OutilsController
      */
     protected function action_initScenario(Object $game, $params, $request)
     {
-        //Choisi l'init en fontion du scénario
-        switch($game->getScenario()->getTitre())
-        {
-            case "L'exam !":
-                $game = $this->action_initExam($game, $params);
-            break;
-        }
-        //Assignation des étapes dans la partie
-        foreach($game->getScenario()->getEtapes() as $etape)
-        {
-            $commut = new Commut();
-            //$commut->setGame($game);
-            $commut->setEtape($etape);
-            $commut->setEtat(false);
-            $commut->setDeblocable(false); // A modifier
-            $game->addCommut($commut);
-        }
-        return $game;
-    }
-    
-    /**
-     * ACTION : EXAM - Crée une bombe avec fils et vis lors de la création d'une partie de l'exam
-     */
-     protected function action_initExam(Object $game, $params)
-    {
-        //Création d'un objet de scénario
+        $game = parent::action_initScenario($game, $params, $request);
+        
+        //Création d'un objet pour le scénario
         $objetBombe = new ObjetScenario();
+        $objetBombe->setNom('bombe');
         //Création de la bombe
         $objetBombe->setBombe($this->_CreateBombe());
         //Ajout de l'objetScenario dans la partie
@@ -131,24 +81,12 @@ class ExamAdminController extends OutilsController
     }
 
     /**
-     * ACTION : Choisi l'action lors d'un edit en fonction du scénario
+     * ACTION : Edition du scénario
      */
     protected function action_editScenario(Object $game, $params, $request)
     {
-        switch($game->getScenario()->getTitre())
-        {
-            case "L'exam !":
-                $game = $this->action_editExam($game, $params, $request);
-            break;
-        }
-        return $game;
-    }
-    
-    /**
-     * ACTION : EXAM - Action lors de l'edit du scénario l'exam
-     */
-     protected function editExam(Object $game, $params, $request)
-    {
+        $game = parent::action_editScenario($game, $params, $request);
+
         foreach($game->getObjetsScenario() as $objet)
         {
             //Permet d'éditer la durée de la bombe
@@ -162,28 +100,6 @@ class ExamAdminController extends OutilsController
             }
         }
         return $game;
-    }
-    //-----------------------------------------------------------------------------------
-    // FONCTIONS DE SIMPLIFICATION EN PRIVATE ===========================================
-    //-----------------------------------------------------------------------------------
-    /**
-     * Création d'une étape obligatoirment sur false en début de partie
-     */
-    private function CreationEtape($etapes, $titre, $descriptif, $parents = null, $automatique = false)
-    {
-        $etape = new Etape();        
-        $etape->setTitre($titre);
-        $etape->setDescriptif($descriptif);
-        $etape->setAutomatique($automatique);
-        if($parents != null)
-        {
-            foreach($parents as $parent)
-            {
-                $etape->addParent($etapes[$parent]);
-            }
-        }
-        $etapes[$titre] = $etape;
-        return $etapes;        
     }
 
     //-----------------------------------------------------------------------------------
@@ -224,10 +140,11 @@ class ExamAdminController extends OutilsController
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // CREATION DE BASE DES SCENARIO
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * EXAM - Création du scénario
      */
-    private function CreationScenarioExam($manager)
+    private function CreationScenario($manager)
     {
         //Création du scnenario
         $scenario = new Scenario();
@@ -315,66 +232,5 @@ class ExamAdminController extends OutilsController
         //Sauvegarde en BDD
         $manager->persist($scenario);
         $manager->flush();
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * @Route("/escape/admin/control/trigg/{id}/{gameId}", name="escape_admin_control_trigg")
-     */
-    public function control_trigg(TriggRepository $repo, $id, $gameId, EntityManagerInterface $manager)
-    {
-        $etapes = $repo->find($id);
-        $etapes->setEtat(true);
-        $manager->persist($etapes);
-        $manager->flush();
-        return $this->redirectToRoute('exam_admin_control', ['id' => $gameId]);
-    }
-
-    /**
-     * @Route("/escape/admin/control/{id}", name="escape_admin_control")
-     */
-    public function control(GameRepository $repo, $id)
-    {
-        $game = $repo->find($id);
-
-        $nextTriggs = $game->getScenario()->NextTriggs();
-
-        return $this->render('exam_admin/control.html.twig', [
-            'game' => $game,
-            'nextTriggs' => $nextTriggs,
-        ]);
     }
 }

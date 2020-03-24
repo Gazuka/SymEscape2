@@ -27,6 +27,24 @@ class ObjetScenario
      */
     private $game;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $nom;
+
+    /**
+     * Retourne le seul objet possible
+     *
+     * @return void
+     */
+    public function getObjet()
+    {
+        if($this->bombe != null)
+        {
+            return $this->bombe;
+        }
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,5 +77,17 @@ class ObjetScenario
     public function __toString()
     {
         return "objet_".$this->id;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(string $nom): self
+    {
+        $this->nom = $nom;
+
+        return $this;
     }
 }

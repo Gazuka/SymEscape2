@@ -35,7 +35,7 @@ class Game
     private $scenario;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Commut", mappedBy="partie", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\Commut", mappedBy="game", orphanRemoval=true)
      */
     private $commuts;
 
@@ -119,23 +119,9 @@ class Game
     }
 
     /**
-     * Donne en secondes la durée restante sur la bombe
-     */
-    public function calculDureeBombe(): int
-    {
-        //Nombres de secondes entre maintenant et l'heure de début de la bombe
-        $now = new DateTime();
-        $difference = $this->getBombe()->getStart()->diff($now);
-        $DureeEcoule = $difference->format('%h') * 60 * 60 + $difference->format('%i') * 60 + $difference->format('%s');
-        $DureeDeLaBombe = $this->getBombe()->getDuration();
-        $DureeRestante = $DureeDeLaBombe - $DureeEcoule;        
-        return $DureeRestante;
-    }
-
-    /**
      * Met en route la partie 
      */
-    public function Debuter(): bool
+    public function debuter(): bool
     {
         if($this->start == null)
         {
@@ -145,16 +131,6 @@ class Game
             return true;
         }
         return false;
-    }
-
-    /**
-     * Active la bombe 
-     */
-    public function StartBombe()
-    {
-        $now = new DateTime();
-        $now->format('Y-m-d H:i:s');
-        //$this->getBombe()->setStart($now);// A retoucher
     }
 
     public function getScenario(): ?Scenario
@@ -226,5 +202,121 @@ class Game
         }
 
         return $this;
+    }
+
+    /**
+     * Demande à l'ensemble des commuts de vérifier s'ils sont déblocables
+     *
+     * @return void
+     */
+    public function verifCommutsDeblocables($commut)
+    {
+        foreach($commut->getEtape()->getEnfants() as $etapeEnfant)
+        {
+            //Enfant à vérifier
+            //dump("Enfant à vérifier ".$etapeEnfant->getTitre());
+            //Si il est automatique, on ne s'occupe de rien, sinon on le gère manuellement
+            if($etapeEnfant->getAutomatique() == false)
+            {
+                //dump("-- A vérifier manuellement");
+                //On récupère le commut de l'etape enfant
+                $deblok = true;
+                $commutEnfant = $this->rechercheCommutEtape($etapeEnfant);
+                //On recherche toutes les étapes parentes du commut enfant
+                foreach($commutEnfant->getEtape()->getParents() as $etapeParentdeEnfant)
+                {
+                    //dump("---- Parent A vérifier : ".$etapeParentdeEnfant->getTitre());
+                    //On ne verifie pas le parent à l'origine de la demande...
+                    if($etapeParentdeEnfant != $commut)
+                    {
+                        //Parent a vérifier
+                        $commutParentEnfant = $this->rechercheCommutEtape($etapeParentdeEnfant);
+                        if($commutParentEnfant->getEtat() == false)
+                        {
+                            $deblok = false;
+                        }
+                    }
+                }
+                $commutEnfant->setDeblocable($deblok);
+            }
+            //dump("=================================");
+        }
+        //die();
+    }
+
+    /**
+     * Retourne le commut qui correspond à une étape précise
+     *
+     * @return void
+     */
+    public function rechercheCommutEtape(Etape $etape)
+    {
+        $result = false;
+        foreach($this->commuts as $commut)
+        {
+            if($commut->getEtape() == $etape)
+            {
+                $result = $commut;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Retourne le commut qui correspond à un nom d'étape
+     *
+     * @return void
+     */
+    public function rechercheCommutTitre(string $titre)
+    {
+        $result = false;
+        foreach($this->commuts as $commut)
+        {
+            if($commut->getEtape()->getTitre() == $titre)
+            {
+                $result = $commut;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Retourne l'objet qui correspond à un nom d'objetScenario
+     *
+     * @return void
+     */
+    public function rechercheObjetScenario(string $nom)
+    {
+        foreach($this->objetsScenario as $objetScenario)
+        {
+            if($objetScenario->getNom() == $nom)
+            {
+                return $objetScenario->getObjet();
+            }
+        }
+    }
+
+    /**
+     * Retourne l'état d'un commut
+     *
+     * @param string $titre //Titre de l'étape du commut
+     * @return void
+     */
+    public function etatCommut(string $titre)
+    {
+        $commut = $this->rechercheCommutTitre($titre);
+        return $commut->getEtat();
+    }
+
+    /**
+     * Passe un commut sur l'état true
+     *
+     * @param string $titre //Titre de l'étape du commut
+     * @return void
+     */
+    public function onCommut(string $titre)
+    {
+        $commut = $this->rechercheCommutTitre($titre);
+        $commut->setEtat(true);
     }
 }

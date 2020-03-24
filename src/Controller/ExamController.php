@@ -19,12 +19,11 @@ class ExamController extends AbstractController
 {
     private $twig;
     private $paramTwig = array();
-    private $triggOn = array();
 
     /**
      * @Route("/escape", name="escape")
      * 
-     * Affiche la liste des parties
+     * N'est plus utilisé pour l'instant...
      */
     public function index(GameRepository $repo)
     {
@@ -37,6 +36,8 @@ class ExamController extends AbstractController
 
     /**
      * @Route("escape/exam/{id}", name="escape_exam")
+     * 
+     * La page qui gère la partie en cours
      */
     public function exam($id, GameRepository $repo, Request $request, EntityManagerInterface $manager)
     {
@@ -49,16 +50,13 @@ class ExamController extends AbstractController
 
         //Gestion du temps
         $SecondesDeJeu = $game->calculDureeDeJeu();
-       
+
         /*******************************************/
         /* --- AVANT LE LANCEMENT DE LA PARTIE --- */
         /*******************************************/
 
-        dump($game);
-        die();
-
         //Si la partie n'est pas démarré
-        if($this->trigger($game, "StartGame") != true)
+        if($game->etatCommut('StartGame') != true)
         {
             //Affichage de la page de lancement de la partie
             $this->defineTwig('exam/pregame.html.twig');
@@ -70,21 +68,21 @@ class ExamController extends AbstractController
             /*******************************************/
     
             //Si l'intro n'est pas encore lu
-            if($this->trigger($game, "VisionageIntro") != true)
+            if($game->etatCommut('VisionageIntro') != true)
             {
                 //Si durée de jeu <= MINUTES_INTRO on affiche l'horloge classique
                 if($SecondesDeJeu <= MINUTES_INTRO * 60)
                 {
                     //affichage de l'horloge
                     $this->defineTwig('exam/horloge.html.twig');
-                    $this->defineParamTwig("duree", $SecondesDeJeu); 
+                    $this->defineParamTwig('duree', $SecondesDeJeu); 
                 }
                 //Sinon on lance l'intro
                 else
                 {
                     //Lancement de la vidéo d'intro
-                    $this->video("intro");
-                    $this->defineTriggOn("VisionageIntro");                    
+                    $this->video('intro');
+                    $game->onCommut('VisionageIntro');                    
                 }
             }
             else
@@ -93,23 +91,29 @@ class ExamController extends AbstractController
                 /* --- PARTIE EN COURS ---                 */
                 /*******************************************/
                 
+                //On récupère la bombe
+                $bombe = $game->rechercheObjetScenario('bombe');
+
                 //Si la bombe n'est pas encore mise en route on la démarre
-                if($this->trigger($game, "StartBombe") != true)
+                if($game->etatCommut('StartBombe') != true)
                 {
-                    $game->StartBombe();
-                    $this->defineTriggOn("StartBombe"); 
+                    $bombe->StartBombe();
+                    $game->onCommut('StartBombe'); 
                 }
 
                 //Le compte a rebours arrive juste à 0
-                if($this->trigger($game, "Boum") != true && $game->calculDureeBombe() <= 0)
+                if($game->etatCommut('Boum') != true && $bombe->calculDureeBombe() <= 0)
                 {
                     $this->defineTwig('exam/game.html.twig');
-                    $this->defineTriggOn("Boum"); 
+                    $this->defineParamTwig("form", $form->createView());
+                    $this->defineParamTwig("duree", $SecondesDeJeu - (MINUTES_INTRO * 60));
+                    $this->defineParamTwig("dureebombe", $bombe->calculDureeBombe());
+                    $game->onCommut('Boum'); 
                 }
                 else
                 {
                     //Si la bombe est encore active
-                    if($this->trigger($game, "DesamorcageRate") != true && $this->trigger($game, "DesamorcageReussi") != true && $this->trigger($game, "Boum") != true)
+                    if($game->etatCommut('DesamorcageRate') != true && $game->etatCommut('DesamorcageReussi') != true && $game->etatCommut('Boum') != true)
                     {
                         //Action a effectuer selon le scan
                         $game = $this->gestionScan($game, $form);
@@ -117,25 +121,25 @@ class ExamController extends AbstractController
                         //Affichage de la bombe
                         $this->defineTwig('exam/game.html.twig');
                         $this->defineParamTwig("duree", $SecondesDeJeu - (MINUTES_INTRO * 60));
-                        $this->defineParamTwig("dureebombe", $game->calculDureeBombe());
+                        $this->defineParamTwig("dureebombe", $bombe->calculDureeBombe());
                         $this->defineParamTwig("form", $form->createView());
                     }
                     else
                     {
                         //Changement d'état de la bombe, on lance la video adapté
-                        if($this->trigger($game, "FinGame") != true)
+                        if($game->etatCommut('FinGame') != true)
                         {
-                            if($this->trigger($game, "DesamorcageReussi") == true)
+                            if($game->etatCommut('DesamorcageReussi') == true)
                             {
-                                $this->video("gagne"); 
+                                $this->video('gagne'); 
                             }
                             else
                             {
-                                $this->video("perdu");
+                                $this->video('perdu');
                             }
 
                             //On déclare la fin de partie
-                            $this->defineTriggOn("FinGame"); 
+                            $game->onCommut('FinGame'); 
                         }
                         else
                         {
@@ -156,33 +160,38 @@ class ExamController extends AbstractController
     }
 
     /**
-     * @Route("/exam/game/{id}/start", name="game_start")
+     * @Route("/escape/exam/{id}/start", name="escape_exam_start")
+     * 
+     * Page qui démarre simplement la partie puis se redirige vers la page du jeu
      */
     public function gameStart($id, GameRepository $repo, EntityManagerInterface $manager)
     {
         $game = $repo->find($id);
-        $game->Debuter();
-        $this->triggOn($game, "StartGame");
+        $game->debuter();
+        $game->onCommut('StartGame');
         $manager->persist($game);
         $manager->flush();
-        return $this->redirectToRoute('game', ['id' => $game->getId()]);
+        return $this->redirectToRoute('escape_exam', ['id' => $game->getId()]);
     }
 
     /**
-     * @Route("/exam/game/{id}/coupe/{cutId}", name="game_cut")
+     * @Route("/escape/exam/{id}/coupe/{cutId}", name="escape_exam_cut")
      */
     public function gameCut($id, $cutId, GameRepository $repo, FilRepository $repoFil, EntityManagerInterface $manager)
     {
         $game = $repo->find($id);
         
+        //On récupère la bombe
+        $bombe = $game->rechercheObjetScenario('bombe');
+
         //Verification si la pince est activée
-        if($game->getBombe()->getPince() == true)
+        if($bombe->getPince() == true)
         {
             //Si il reste plus de 2 fils on coupe !
-            if(sizeof($game->getBombe()->FilsRestants()) != 2)
+            if(sizeof($bombe->FilsRestants()) != 2)
             {
                 //On coupe le fil
-                if($cutId == $game->getBombe()->filACouper())
+                if($cutId == $bombe->filACouper())
                 {
                     $fil = $repoFil->find($cutId);
                     $fil->setEtat(0);
@@ -191,23 +200,37 @@ class ExamController extends AbstractController
                 else
                 {
                     //Perdu //Un mauvais fil a été coupé...
-                    $this->triggOn($game, "DesamorcageRate");                     
+                    $game->onCommut('DesamorcageRate');                     
                 }
             }
             else
             {
                 //Gagné - On coupe le dernier fil est c'est gagné
-                $this->triggOn($game, "DesamorcageReussi");
+                $game->onCommut('DesamorcageReussi');
             }
 
             $manager->persist($game);
             $manager->flush();
         }        
-        return $this->redirectToRoute('game', ['id' => $game->getId()]);
+        return $this->redirectToRoute('escape_exam', ['id' => $game->getId()]);
     }
 
+    /****************************************************************************************/
+    /*** FONCTIONS SPECIFIQUES **************************************************************/
+    /****************************************************************************************/
+
+    /**
+     * Choisi les actions à faire en fonction du scan par code barre
+     *
+     * @param [Game] $game
+     * @param [type] $form
+     * @return void
+     */
     private function gestionScan($game, $form)
     {
+        //On récupère la bombe
+        $bombe = $game->rechercheObjetScenario('bombe');
+
         //Action a effectuer selon le code barre
         $code = $this->Scan($form);
         switch($code)
@@ -215,17 +238,17 @@ class ExamController extends AbstractController
             //Code barre du tournevis
             case '020312':
             case '020310':
-                $game->getBombe()->devisser();
-                if($game->getBombe()->VisRestantes() == 0)
+                $bombe->devisser();
+                if($bombe->VisRestantes() == 0)
                 {
-                    $this->triggOn($game, "VisSupprimees"); 
+                    $game->onCommut('VisSupprimees'); 
                 }
             break;
             //Code barre de la pince
             case '020311':
             case '020309':
-                $game->getBombe()->setPince(1);
-                $this->triggOn($game, "PinceActive");
+                $bombe->setPince(1);
+                $game->onCommut('PinceActive');
             break;
             case null:
             break;           
@@ -233,6 +256,18 @@ class ExamController extends AbstractController
         return $game;
     }
 
+    
+
+    /****************************************************************************************/
+    /*** FONCTIONS GENERIQUES ***************************************************************/
+    /****************************************************************************************/
+
+    /**
+     * Retourne les données scannées par le lecteur de code barre
+     *
+     * @param [type] $form
+     * @return void
+     */
     private function Scan($form)
     {
         $scan = null;
@@ -244,7 +279,10 @@ class ExamController extends AbstractController
     }
 
     /**
-     * Affiche une video
+     * Permet de demander la lecture d'une vidéo
+     *
+     * @param [string] $video //Nom de la vidéo
+     * @return void
      */
     private function video($video)
     {
@@ -252,59 +290,38 @@ class ExamController extends AbstractController
         $this->defineParamTwig("video", $video);
     }
 
-    /*****************/
-    /*** FONCTIONS ***/
-    /*****************/
-
     /**
-     * Vérifie l'état d'un trigg et retour true or false
+     * Permet de définir le Twig qui sera utilisé lors de l'affichage
+     *
+     * @param [string] $twig //Chemin du twig
+     * @return void
      */
-    private function trigger($game, $titre)
-    {
-        foreach($game->getScenario()->getTriggs() as $trigg)
-        {
-            if($trigg->getTitre() == $titre)
-            {
-                return $trigg->getEtat();
-            }
-        }
-        return null;        
-    }
-
-    /**
-     * Active un trigg
-     */
-    private function triggOn($game, $titre)
-    {
-        foreach($game->getScenario()->getTriggs() as $trigg)
-        {
-            if($trigg->getTitre() == $titre)
-            {
-                $trigg->setEtat(true);
-            }
-        }
-    }
-
     private function defineTwig($twig)
     {
         $this->twig = $twig;
     }
+
+    /**
+     * Permet de définit les paramètres utiles au Twig lors de l'affichage
+     *
+     * @param [string] $cle //Nom de la variable dans le twig
+     * @param [type] $valeur //Données qui seront utilisées dans le twig
+     * @return void
+     */
     private function defineParamTwig($cle, $valeur)
     {
         $this->paramTwig[$cle] = $valeur;
     }
-    private function defineTriggOn($cle)
-    {
-        array_push($this->triggOn, $cle);
-    }
-    
+
+    /**
+     * Sauvegarde la partie et affiche la page requise
+     *
+     * @param [ObjectManager] $manager
+     * @param [Game] $game
+     * @return void
+     */
     private function SaveShow($manager, $game)
     {
-        //Active les triggs
-        foreach($this->triggOn as $trigg)
-        {
-            $this->triggOn($game, $trigg);
-        }
         //Sauvegarde de la partie
         $manager->persist($game);
         $manager->flush();

@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends '_base.html.twig' %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('bombe/style.css') }}"/>
@@ -13,6 +13,7 @@
 
 {% block body %}
     <p>La partie est fini</p>
+    {#
     {% for trigg in game.scenario.triggs %}
         {% if trigg.titre == "DesamorcageReussi" and trigg.etat == true %}
             <h1>Félicitation, vous avez réussi à désamorcer la bombe !</h1>        
@@ -24,5 +25,6 @@
             <h1>Vous avez mis trop de temps, la bombe a explosé.</h1>        
         {% endif %}
     {% endfor %}
+    #}
 
 {% endblock %}

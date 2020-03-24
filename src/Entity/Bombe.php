@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\BombeRepository")
@@ -398,5 +399,31 @@ class Bombe
         }
 
         return $this;
+    }
+
+    /**
+     * Permet de démarrer la bombe
+     *
+     * @return void
+     */
+    public function StartBombe()
+    {
+        $now = new DateTime(); 
+        $now->format('Y-m-d H:i:s'); 
+        $this->start = $now; 
+    }
+
+    /**
+     * Donne en secondes la durée restante sur la bombe
+     */
+    public function calculDureeBombe(): int
+    {
+        //Nombres de secondes entre maintenant et l'heure de début de la bombe
+        $now = new DateTime();
+        $difference = $this->start->diff($now);
+        $DureeEcoule = $difference->format('%h') * 60 * 60 + $difference->format('%i') * 60 + $difference->format('%s');
+        $DureeDeLaBombe = $this->duration;
+        $DureeRestante = $DureeDeLaBombe - $DureeEcoule;        
+        return $DureeRestante;
     }
 }

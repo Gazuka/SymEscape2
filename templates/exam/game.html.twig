@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends '_base.html.twig' %}
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('bombe/style.css') }}"/>
@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block meta %}
-    <meta http-equiv="refresh" content="30;url={{ path('game', {'id' : game.id}) }}" />
+    <meta http-equiv="refresh" content="30;url={{ path('escape_exam', {'id' : game.id}) }}" />
     
 {% endblock %}
 
@@ -20,29 +20,30 @@
         <div class="zone1">&nbsp;</div>
         <div class="zone2">&nbsp;</div>            
         <div class="zone3">
-            <div class="zone4" id="compte_a_rebours">90:00</div>
+            <div class="zone4" id="compte_a_rebours">88:88</div>
             <div class="zone5">&nbsp;</div>
         </div>
         <div class="zone6">&nbsp;</div>
     </div>
     <div class="back2">&nbsp;</div>
     <div class="back3">
-        {% if game.bombe.visRestantes > 0 %}
+        {% set bombe = game.rechercheObjetScenario('bombe') %}
+        {% if bombe.visRestantes > 0 %}
             {# couvercle de bombe #}
             <div class="back5">
-                <div class="vis1 {% if game.bombe.visRestantes > 0 %}visOn{% endif %}">&nbsp;</div>
-                <div class="vis2 {% if game.bombe.visRestantes > 1 %}visOn{% endif %}">&nbsp;</div>
-                <div class="vis3 {% if game.bombe.visRestantes > 2 %}visOn{% endif %}">&nbsp;</div>
-                <div class="vis4 {% if game.bombe.visRestantes > 3 %}visOn{% endif %}">&nbsp;</div>
+                <div class="vis1 {% if bombe.visRestantes > 0 %}visOn{% endif %}">&nbsp;</div>
+                <div class="vis2 {% if bombe.visRestantes > 1 %}visOn{% endif %}">&nbsp;</div>
+                <div class="vis3 {% if bombe.visRestantes > 2 %}visOn{% endif %}">&nbsp;</div>
+                <div class="vis4 {% if bombe.visRestantes > 3 %}visOn{% endif %}">&nbsp;</div>
             </div>
         {% else %}
             {# plus de couvercle de bombe #}
             <div class="back4">
                 <div class="fils">
-                    {% for fil in game.bombe.fils %}
-                        {% if game.bombe.pince == 1 %}
+                    {% for fil in bombe.fils %}
+                        {% if bombe.pince == 1 %}
                             {% if fil.etat == 1 %}
-                                <a class="fil_autorise" href="{{ path('game_cut', {'id' : game.id, 'cutId' : fil.id}) }}"><div class="fil fil_{{ fil.couleur }}"></div></a>
+                                <a class="fil_autorise" href="{{ path('escape_exam_cut', {'id' : game.id, 'cutId' : fil.id}) }}"><div class="fil fil_{{ fil.couleur }}"></div></a>
                             {% else %}
                                 <div class="fil_coupe fil_coupe_{{ fil.couleur }}"></div>
                             {% endif %}
@@ -55,7 +56,7 @@
         {% endif %}
     </div>
     
-    {% if game.bombe.pince %}
+    {% if bombe.pince %}
         <img src="{{ asset('bombe/images/pince.jpg') }}"/>
     {% endif %}
 
@@ -85,6 +86,10 @@
         {
             var minutes = Math.trunc(duree / 60);
             var secondes = Math.trunc(duree - (minutes * 60));
+            if(minutes <= 0 && secondes <= 0)
+            {
+                window.location.reload();
+            }
             minuteur(duree, minutes, secondes);
         } 
 

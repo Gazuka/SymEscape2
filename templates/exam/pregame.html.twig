@@ -1,17 +1,15 @@
-{% extends 'base.html.twig' %}
+{% extends '_base.html.twig' %}
 
 {% block stylesheets %}
     
 {% endblock %}
 
 {% block meta %}
-    <meta http-equiv="refresh" content="30;url={{ path('game', {'id' : game.id}) }}" />
+    {#<meta http-equiv="refresh" content="30;url={{ path('escape_exam', {'id' : game.id}) }}" />#}
 {% endblock %}
 
 {% block title %}Lancement de l'exam en attente{% endblock %}
 
 {% block body %}
-    <a href="{{ path('game_start', {'id' : game.id}) }}">Débuter la partie</a>
+    <a href="{{ path('escape_exam_start', {'id' : game.id}) }}">Démarrer l'exam !</a>
 {% endblock %}
-
-

@@ -28,12 +28,22 @@
                             {{ joueur.prenom }}
                         {% endfor %}
                     </td>
-                    <td scope="col"><i class="far fa-calendar"></i> En attente / <i class="far fa-calendar-check"></i> En cours / <i class="far fa-calendar-times"></i> Fini</td>
+                    <td scope="col">
+                        {% if game.etatCommut('FinGame') == true %}
+                            <i class="far fa-calendar-times"></i> Fini
+                        {% else %}
+                            {% if game.etatCommut('StartGame') == true %}
+                                <i class="far fa-calendar-check"></i> En cours
+                            {% else %}
+                                <i class="far fa-calendar"></i> En attente
+                            {% endif %}
+                        {% endif %}
+                    </td>
                     {% if game.scenario.titre == "L'exam !" %}
                         <td><a href="{{ path('escape_exam', {'id' : game.id}) }}"><i class="fas fa-door-open"></i></a></td>
+                        <td><a href="{{ path('escape_admin_control', {'id' : game.id}) }}"><i class="fas fa-eye"></i></a></td>
+                        <td><a href="{{ path('escape_admin_exam_edit', {'id' : game.id}) }}"><i class="fas fa-cogs"></i></a></td>
                     {% endif %}
-                    <td><a href="{{ path('escape_admin_control', {'id' : game.id}) }}"><i class="fas fa-eye"></i></a></td>
-                    <td><a href="{{ path('escape_admin_edit', {'id' : game.id}) }}"><i class="fas fa-cogs"></i></a></td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends '_base.html.twig' %}
 
 {% block title %}Salles d'exam{% endblock %}
 
@@ -22,11 +22,11 @@
                 var video = document.getElementById('video');
                 video.muted = "muted";
                 video.play();
-                setTimeout(activeSon, 1000);
+                setTimeout(activeSon(video), 1000);
                 video.onended = function()
                 {
                     //Rechargement de la page à la fin de la vidéo
-                    var url = "{{ path('game', {'id' : game.id}) }}";
+                    var url = "{{ path('escape_exam', {'id' : game.id}) }}";
                     document.location.href=url;
                 }
             }
