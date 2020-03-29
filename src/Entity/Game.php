@@ -214,10 +214,9 @@ class Game
         foreach($commut->getEtape()->getEnfants() as $etapeEnfant)
         {
             //Enfant à vérifier
-            //dump("Enfant à vérifier ".$etapeEnfant->getTitre());
             //Si il est automatique, on ne s'occupe de rien, sinon on le gère manuellement
-            if($etapeEnfant->getAutomatique() == false)
-            {
+            /*if($etapeEnfant->getAutomatique() == false)
+            {*/
                 //dump("-- A vérifier manuellement");
                 //On récupère le commut de l'etape enfant
                 $deblok = true;
@@ -238,10 +237,8 @@ class Game
                     }
                 }
                 $commutEnfant->setDeblocable($deblok);
-            }
-            //dump("=================================");
+            /*}*/
         }
-        //die();
     }
 
     /**
@@ -318,5 +315,23 @@ class Game
     {
         $commut = $this->rechercheCommutTitre($titre);
         $commut->setEtat(true);
+    }
+
+    /**
+     * Retourne les commuts qui sont déblocables et pas actifs
+     *
+     * @return void
+     */
+    public function commutsDeblocables()
+    {
+        $commutsDeblocables = array();
+        foreach($this->commuts as $commut)
+        {
+            if($commut->getDeblocable() == true && $commut->getEtat() == false) // && $commut->getEtat() == false
+            {
+                array_push($commutsDeblocables, $commut);
+            }
+        }
+        return $commutsDeblocables;
     }
 }

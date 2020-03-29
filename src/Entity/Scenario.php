@@ -26,16 +26,21 @@ class Scenario
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Game", mappedBy="scenario")
      */
-    private $game;
+    private $games;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Etape", mappedBy="scenario", orphanRemoval=true, cascade={"persist", "remove"})
      */
     private $etapes;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $code;
+
     public function __construct()
     {
-        $this->game = new ArrayCollection();
+        $this->games = new ArrayCollection();
         $this->etapes = new ArrayCollection();
     }
 
@@ -59,15 +64,15 @@ class Scenario
     /**
      * @return Collection|Game[]
      */
-    public function getGame(): Collection
+    public function getGames(): Collection
     {
-        return $this->game;
+        return $this->games;
     }
 
     public function addGame(Game $game): self
     {
-        if (!$this->game->contains($game)) {
-            $this->game[] = $game;
+        if (!$this->games->contains($game)) {
+            $this->games[] = $game;
             $game->setScenario($this);
         }
 
@@ -76,8 +81,8 @@ class Scenario
 
     public function removeGame(Game $game): self
     {
-        if ($this->game->contains($game)) {
-            $this->game->removeElement($game);
+        if ($this->games->contains($game)) {
+            $this->games->removeElement($game);
             // set the owning side to null (unless already changed)
             if ($game->getScenario() === $this) {
                 $game->setScenario(null);
@@ -135,5 +140,17 @@ class Scenario
     public function __toString(): string
     {
         return $this->titre;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
     }
 }

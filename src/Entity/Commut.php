@@ -84,7 +84,6 @@ class Commut
         if($this->game != null)
         {
            //On demande à game de vérifier les changements de commuts résultant de cette modification (deblocable)
-           dump("Changement d'etat de :".$this->etape->getTitre());
             $this->game->verifCommutsDeblocables($this); 
         } 
         //On note l'heure du changement d'état

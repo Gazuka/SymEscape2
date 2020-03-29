@@ -1,0 +1,14 @@
+div.container {
+    margin-top: 20px;
+}
+
+#horloge
+{
+    font-size: 500px;
+}
+
+div.backvideo
+{
+    background-color: black;
+    height: 600px;
+}

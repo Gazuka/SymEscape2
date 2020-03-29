@@ -45,7 +45,7 @@ class EscapeController extends AbstractController
         $scan = null;
         if($form->isSubmitted() && $form->isValid()) 
         {
-            $scan = $form['scan']->getData();            
+            $scan = $form['scan']->getData();       
         }
         return $scan;
     }

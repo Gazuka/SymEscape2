@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
-class GameType extends AbstractType
+class GameType extends OutilsType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -21,7 +21,8 @@ class GameType extends AbstractType
                 'entry_type' => JoueurType::class,
                 'allow_add' => true,
                 'allow_delete' => true,
-                'label' => "Liste des joueurs :"
+                'label' => "Liste des joueurs :",
+                'attr' => ['class'=>'row']
             ])
         ;
     }

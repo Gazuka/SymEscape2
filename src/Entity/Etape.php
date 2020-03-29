@@ -54,11 +54,28 @@ class Etape
      */
     private $commuts;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Indice", mappedBy="etape", orphanRemoval=true, cascade={"persist", "remove"})
+     */
+    private $indices;
+
     public function __construct()
     {
         $this->parents = new ArrayCollection();
         $this->enfants = new ArrayCollection();
         $this->commuts = new ArrayCollection();
+        $this->indices = new ArrayCollection();
+        for($i=0;$i<3;$i++)
+        {
+            $indice = new Indice();
+            $indice->setDescriptif('...');
+            $this->addIndice($indice);
+        }
+    }
+
+    public function __toString()
+    {
+        return $this->titre;
     }
 
     public function getId(): ?int
@@ -215,5 +232,36 @@ class Etape
             }
         }
         return $deblocable;
+    }
+
+    /**
+     * @return Collection|Indice[]
+     */
+    public function getIndices(): Collection
+    {
+        return $this->indices;
+    }
+
+    public function addIndice(Indice $indice): self
+    {
+        if (!$this->indices->contains($indice)) {
+            $this->indices[] = $indice;
+            $indice->setEtape($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIndice(Indice $indice): self
+    {
+        if ($this->indices->contains($indice)) {
+            $this->indices->removeElement($indice);
+            // set the owning side to null (unless already changed)
+            if ($indice->getEtape() === $this) {
+                $indice->setEtape(null);
+            }
+        }
+
+        return $this;
     }
 }

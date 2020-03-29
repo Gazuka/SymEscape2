@@ -1,0 +1,331 @@
+body {
+    text-align : center;
+    background:black;
+    color:white;
+    margin: 0px;
+    padding: 0px;
+    border: 1px solid black;
+
+    /*cursor: crosshair; */
+    /*cursor: wait;   */
+    /* interdit */
+    
+}
+
+.indices
+{
+    background-color: black;
+    position: relative;
+	display: inline; 
+	float: left;
+	width: 300px;
+    height: 100px;
+    margin-top: 90px;
+    margin-left: 50px;
+	z-index: 2;
+}
+
+.indice
+{
+    width: 300px;
+    /*height: 100px;*/
+    margin-bottom: 10px;
+    z-index: 2;
+}
+
+.formscan
+{
+    color: black;
+    background-color: black;
+    font-size: 1px;
+    position: relative;
+	display: inline; 
+	float: right;
+	width: 5px;
+	height: 5px;
+	z-index: 1;
+}
+
+.icones
+{
+    color: black;
+    background-color: black;
+    font-size: 1px;
+    position: relative;
+	display: inline;
+	width: 100px;
+    height: 100px;    
+    z-index: 1;
+    float: right;
+    margin-top: 20px;
+    margin-right: 100px;
+}
+.icones img
+{
+    width: 100px;
+    display: inline-block;
+    float: left; 
+}
+
+#scan input
+{
+    color: black;
+    background-color: black;
+    border: 0px;
+    width: 5px;
+    outline: none;
+}
+
+#scan:focus
+{
+    /*background-color: black;
+    border: 10px solid black; */
+    outline: none;   
+}
+
+.bombe
+{
+    width: 100%;
+    color:red;
+    font-family: 'Oxygen Mono', monospace;
+    font-size: 120px;   
+}
+
+.zone1
+{
+    /*float:left;*/
+    margin: auto;
+    width:80%;
+    background-size: cover;
+    height:135px;
+    background-image:url('../exam/images/bombe/bombe_02.jpg');    
+}
+.zone1b
+{
+    margin: auto;
+    width:80%;  
+    background-color: yellow; 
+}
+
+.zone2
+{
+    width:532px;
+    height: 290px;
+    background-size: cover;
+    background-image:url('../exam/images/bombe/bombe_03.jpg');
+    display: inline-block;
+    float: left;
+}
+
+.zone3
+{
+    display: inline-block;
+    float: left;
+    width: 405px;
+    height: 290px;
+}
+
+.zone4
+{
+    width: 100%;
+    display: inline-block;
+    float: left;
+    height: 168px;
+    background-size: cover;
+    background-image:url('../exam/images/bombe/bombe_04.jpg');
+}
+
+.zone5
+{
+    width: 100%;
+    display: inline-block;
+    float: left;
+    height: 122px;
+    background-size: cover;
+    background-position: top;
+    background-image:url('../exam/images/bombe/bombe_06.jpg');
+}
+
+.zone6
+{
+    margin: 0px;
+    display: inline-block;
+    float: left;
+    width:583px;
+    height: 290px;
+    background-size: cover;
+    background-image:url('../exam/images/bombe/bombe_05.jpg');
+}
+
+.back1
+{
+    width:100%;
+    height:80px;
+    background-size: cover;
+    background-position: bottom;
+    background-image:url('../exam/images/bombe/back_1.jpg');    
+}
+
+.back2
+{
+    display: inline-block;
+    /*float:left;*/
+    width:100%;
+    height:100px;
+    background-size: cover;
+    background-position: top;
+    background-image:url('../exam/images/bombe/back_2.jpg');    
+    margin-top: 20px;
+}
+
+.back3
+{
+    float:left;
+    width:100%;
+    height: 500px;
+    background-size: contain;
+    background-image:url('../exam/images/bombe/back_3.jpg');    
+}
+
+.back4
+{
+    position: relative;
+    margin: auto;
+    width:1000px;
+    height:380px;
+    background-size: contain;
+    background-image:url('../exam/images/bombe/back_4.jpg');      
+}
+
+.back5
+{
+    position: relative;
+    margin: auto;
+    width:1000px;
+    height:380px;
+    background-size: contain;
+    background-image:url('../exam/images/bombe/back_5.jpg');   
+}
+
+.fils
+{
+    float: left;
+    margin-left: 110px;
+    margin-top: 16px;
+}
+.fil
+{
+    float: left;
+    width: 85px;
+    height: 344px;
+    margin-right: 50px;        
+}
+.fil_coupe
+{
+    float: left;
+    width: 85px;
+    height: 344px;
+    margin-right: 50px;
+}
+.fil_rouge
+{
+    background-image:url('../exam/images/bombe/fil_rouge.jpg');    
+}
+.fil_bleu
+{
+    background-image:url('../exam/images/bombe/fil_bleu.jpg');  
+}
+.fil_jaune
+{
+    background-image:url('../exam/images/bombe/fil_jaune.jpg');  
+}
+.fil_blanc
+{
+    background-image:url('../exam/images/bombe/fil_blanc.jpg');  
+}
+.fil_noir
+{
+    background-image:url('../exam/images/bombe/fil_noir.jpg');  
+}
+.fil_coupe_rouge
+{
+    background-image:url('../exam/images/bombe/fil_coupe_rouge.jpg');    
+}
+.fil_coupe_bleu
+{
+    background-image:url('../exam/images/bombe/fil_coupe_bleu.jpg');  
+}
+.fil_coupe_jaune
+{
+    background-image:url('../exam/images/bombe/fil_coupe_jaune.jpg');  
+}
+.fil_coupe_blanc
+{
+    background-image:url('../exam/images/bombe/fil_coupe_blanc.jpg');  
+}
+.fil_coupe_noir
+{
+    background-image:url('../exam/images/bombe/fil_coupe_noir.jpg');  
+}
+.fil_interdit
+{
+    cursor: not-allowed;     
+}
+.fil_autorise
+{
+    cursor: grab;     
+}
+/*
+.fil_interdit:hover
+{
+    cursor: not-allowed; 
+    
+}*/
+.vis1
+{
+    float: left;
+    margin-top: 50px;
+    margin-left: 50px;
+    width:80px;
+    height:73px;  
+    background-size: contain;  
+    background-image:url('../exam/images/bombe/vis_2.png');  
+}
+
+.vis2
+{
+    float: left;
+    margin-top: 50px;
+    margin-left: 740px;
+    width:80px;
+    height:73px;  
+    background-size: contain;  
+    background-image:url('../exam/images/bombe/vis_2.png');
+}
+
+.vis3
+{
+    float: left;
+    margin-top: 130px;
+    margin-left: 50px;
+    width:80px;
+    height:73px;  
+    background-size: contain;
+    background-image:url('../exam/images/bombe/vis_2.png');
+}
+
+.vis4
+{
+    float: left;
+    margin-top: 130px;
+    margin-left: 740px;
+    width:80px;
+    height:73px;  
+    background-size: contain; 
+    background-image:url('../exam/images/bombe/vis_2.png');
+}
+
+.visOn
+{
+    background-image:url('../exam/images/bombe/vis_1.png');  
+}

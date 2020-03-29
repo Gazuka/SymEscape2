@@ -9,9 +9,13 @@ use App\Entity\Commut;
 use App\Form\GameType;
 use App\Entity\Scenario;
 use App\Entity\ObjetScenario;
+use App\Form\ScenarioEditType;
 use App\Repository\GameRepository;
+use App\Repository\EtapeRepository;
 use App\Controller\OutilsController;
+use App\Repository\IndiceRepository;
 use App\Repository\JoueurRepository;
+use App\Repository\ScenarioRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,11 +68,75 @@ abstract class EscapeAdminController extends OutilsController
     {
         $game = $repo->find($id);
 
-        $nextTriggs = $game->getScenario()->NextTriggs();
+        $commutsDeblocables = $game->commutsDeblocables();
 
         return $this->render('escape_admin/control.html.twig', [
             'game' => $game,
-            'nextTriggs' => $nextTriggs,
+            'commutsDeblocables' => $commutsDeblocables,
+        ]);
+    }
+
+    /**
+     * @Route("/escape/admin/control/{id}/commuton/{commut}", name="escape_admin_control_commuton")
+     * Page utilisé par le surveillant pour indiquer les objets actuellements trouvés
+     */
+    public function controlOnCommut($id, $commut, GameRepository $repo, EntityManagerInterface $manager)
+    {
+        $game = $repo->find($id);
+        if($game->rechercheCommutTitre($commut)->getEtape()->getAutomatique() == false)
+        {
+            $game->onCommut($commut);
+        }        
+        $manager->persist($game);
+        $manager->flush();
+        return $this->redirectToRoute('escape_admin_control', ['id' => $game->getId()]);
+    }
+
+    /**
+     * @Route("/escape/admin/scenarios", name="escape_admin_scenarios")
+     * Affiche le listing des scénarios
+     */
+    public function afficherScenarios(ScenarioRepository $repo, Request $request):Response
+    {
+        $scenarios = $repo->findAll();
+
+        return $this->render('escape_admin/scenarios.html.twig', [
+            'scenarios' => $scenarios,
+        ]);
+    }
+
+    /**
+     * @Route("/escape/admin/scenario/edit/{id}", name="escape_admin_scenario_edit")
+     * Affiche la page d'édition d'un scenario'
+     */
+    public function editScenario(ScenarioRepository $repo, $id, EtapeRepository $repoEtape, IndiceRepository $repoIndice, Request $request, EntityManagerInterface $manager):Response
+    {
+        $scenario = $repo->find($id);
+
+        $variables['request'] = $request;
+        $variables['manager'] = $manager;
+        $variables['element'] = $scenario;
+        $variables['classType'] = ScenarioEditType::class;
+        $variables['pagedebase'] = 'escape_admin/editscenario.html.twig';
+        $variables['pagederesultat'] = 'escape_admin';
+        $variables['titre'] = "Edition d'un scenario";
+        $variables['texteConfirmation'] = "Le scenario ### a bien été éditée !";
+        $options['dependances'] = array('Etapes' => 'Scenario');  
+        $options['deletes'] = array(['findBy' => 'scenario', 'classEnfant' => 'etapes', 'repo' => $repoEtape]); 
+        $options['texteConfirmationEval'] = ["###" => '$element->getTitre();'];
+        return $this->afficherFormulaire($variables, $options);
+    }
+
+    /**
+     * @Route("/escape/admin/scenario/{id}", name="escape_admin_scenario")
+     * Affiche un scenario'
+     */
+    public function afficherScenario(ScenarioRepository $repo, $id, Request $request):Response
+    {
+        $scenario = $repo->find($id);
+
+        return $this->render('escape_admin/scenario.html.twig', [
+            'scenario' => $scenario,
         ]);
     }
 
@@ -116,7 +184,7 @@ abstract class EscapeAdminController extends OutilsController
     }    
     
     //-----------------------------------------------------------------------------------
-    // FONCTIONS DE SIMPLIFICATION EN PRIVATE ===========================================
+    // FONCTIONS DE SIMPLIFICATION EN PROTECTED =========================================
     //-----------------------------------------------------------------------------------
     /**
      * Création d'une étape obligatoirment sur false en début de partie
@@ -136,53 +204,5 @@ abstract class EscapeAdminController extends OutilsController
         }
         $etapes[$titre] = $etape;
         return $etapes;        
-    }
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-    public function control_trigg(TriggRepository $repo, $id, $gameId, EntityManagerInterface $manager)
-    {
-        $etapes = $repo->find($id);
-        $etapes->setEtat(true);
-        $manager->persist($etapes);
-        $manager->flush();
-        return $this->redirectToRoute('exam_admin_control', ['id' => $gameId]);
-    }*/
-
-    
+    }    
 }

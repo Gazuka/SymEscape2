@@ -1,26 +1,34 @@
-{% extends 'base.html.twig' %}
+{% extends 'escape_admin/_base.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('admin/css/admin.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}"/>
 {% endblock %}
 
-{% block title %}Escape Game - Exam - Admin{% endblock %}
+{% block title %}{{ parent() }} / Observation de la partie{% endblock %}
 
-{% block body %}
+{% block content %}
     <h1>Partie : {{ game.id }}</h1>
-     {% for nextTrigg in nextTriggs %}
-        {% if nextTrigg.etat == false %}
-            <div class="icontrigg">
-                <a href={{ path('exam_admin_control_trigg', {'id' : nextTrigg.id, 'gameId' : game.id}) }}>
-                    <div class="icontrigg_1">
-                        {{ nextTrigg.titre }}
+    <p>Prochaines actions à effectuer :</p>
+     {% for commutDeblocable in commutsDeblocables %}
+        {% if commutDeblocable.etape.automatique == false %}
+            <div class="col-12 alert alert-success">
+                <div class="row">
+                    <div class="col-1 text-center">
+                        <a class="btn btn-danger" href={{ path('escape_admin_control_commuton', {'id' : game.id, 'commut' : commutDeblocable.etape.titre }) }}>Trouvé</a>
                     </div>
-                    <div class="icontrigg_2">
-                        {{ nextTrigg.descriptif }}
-                    </div>
-                </a>
+                    <div class="col-11">
+                        <strong>{{ commutDeblocable.etape.descriptif }}</strong>
+                    </div>                    
+                </div>
             </div>
+        {% else %}
+            {% if commutDeblocable.etape.titre != "Boum" and commutDeblocable.etape.titre != "FinGame" %}
+                <div class="col-12 mb-2 alert alert-warning text-decoration-none">
+                    <div class="col-12">
+                        {{ commutDeblocable.etape.descriptif }}
+                    </div>
+                </div>  
+            {% endif %}  
         {% endif %}
      {% endfor %}   
-        
 {% endblock %}

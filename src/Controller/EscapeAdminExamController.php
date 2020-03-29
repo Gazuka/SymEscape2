@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Fil;
 use App\Entity\Vis;
+use App\Entity\Aide;
 use App\Entity\Bombe;
 use App\Entity\Scenario;
 use App\Form\GameEditType;
@@ -31,7 +32,7 @@ class EscapeAdminExamController extends EscapeAdminController
     public function firstinit(EntityManagerInterface $manager)
     {
         //Initialisation des scénario si bdd vide (laisser en commentaire)
-        //$this->CreationScenario($manager);
+        $this->CreationScenario($manager);
 
         return $this->redirectToRoute('escape_admin');
     }
@@ -76,6 +77,14 @@ class EscapeAdminExamController extends EscapeAdminController
         $objetBombe->setBombe($this->_CreateBombe());
         //Ajout de l'objetScenario dans la partie
         $game->addObjetsScenario($objetBombe);
+
+        //Création d'un objet pour le scénario
+        $objetAide = new ObjetScenario();
+        $objetAide->setNom('aide');
+        //Création de la bombe
+        $objetAide->setAide(new Aide());
+        //Ajout de l'objetScenario dans la partie
+        $game->addObjetsScenario($objetAide);
 
         return $game;
     }
@@ -148,6 +157,7 @@ class EscapeAdminExamController extends EscapeAdminController
     {
         //Création du scnenario
         $scenario = new Scenario();
+        $scenario->setCode("exam");
         $scenario->setTitre("L'exam !");
         $etapes = Array();
 

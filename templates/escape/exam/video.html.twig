@@ -1,12 +1,14 @@
-{% extends '_base.html.twig' %}
+{% extends 'escape/exam/_baseexam.html.twig' %}
 
 {% block title %}Salles d'exam{% endblock %}
 
-{% block body %}
-    <video id="video" controls>
-        <source src="{{ asset('exam/videos/'~ video ~'.mp4') }}" type="video/mp4">        
-        <p>Votre navigateur ne prend pas en charge les vidéos HTML5.
-    </video>
+{% block content %}
+    <div class="container-fluid text-center backvideo">
+        <video id="video" controls>
+            <source src="{{ asset('exam/videos/'~ video ~'.mp4') }}" type="video/mp4">        
+            <p>Votre navigateur ne prend pas en charge les vidéos HTML5.
+        </video>
+    </div>
 
     <script type="text/javascript">
             

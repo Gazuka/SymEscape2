@@ -1,4 +1,4 @@
-{% extends '_base.html.twig' %}
+{% extends 'escape/exam/_baseexam.html.twig' %}
 
 {% block stylesheets %}
     
@@ -10,10 +10,15 @@
 
 {% block title %}Exam en cours{% endblock %}
 
-{% block body %}
-    Examen en cours
-    <div id="horloge"></div>
-    
+{% block content %}
+    <div class="container-fluid">
+        <div class="jumbotron">
+            <h1 class="display-4">Examen en cours</h1>
+            <br/>
+            <h1 id="horloge" class="display-1 text-center"></h1>
+        </div>
+    </div>
+
     <script type="text/javascript">
         
         //Affichage de l'horloge + relance de la fonction tic tac toute les secondes

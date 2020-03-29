@@ -1,15 +1,47 @@
-{% extends '_base.html.twig' %}
-
-{% block stylesheets %}
-    
-{% endblock %}
-
-{% block meta %}
-    {#<meta http-equiv="refresh" content="30;url={{ path('escape_exam', {'id' : game.id}) }}" />#}
-{% endblock %}
+{% extends 'escape/exam/_baseexam.html.twig' %}
 
 {% block title %}Lancement de l'exam en attente{% endblock %}
 
 {% block body %}
-    <a href="{{ path('escape_exam_start', {'id' : game.id}) }}">Démarrer l'exam !</a>
+    <div class="container-fluid">
+        <div class="jumbotron">
+            <h1 class="display-4">Examen - Durée : 1h</h1>
+            <p class="lead">Epreuve écrite permettant la sélection des candidats succeptibles de convenir pour le poste recherché.</p>
+            <hr class="my-4">
+            <p>Lorsque tous les candidats seront installés, l'examen pourra démarrer.</p>
+            {% if game.etatCommut('JoueursPrets') == true %}
+                <a class="btn btn-primary btn-lg" href="#" role="button">Attente d'un surveillant pour démarrer l'exam !</a>
+            {% endif %}
+        </div>
+
+        <div class="jumbotron">
+            
+            {{ form_start(form) }}
+            <p>Veuillez vous identifier avant de vous installer à votre table.</p>
+            {{ form_widget(form.scan) }}    
+            {{ form_end(form) }}
+        </div>
+
+        {% for keyFlash, messagesFlash in app.flashes %}
+            {% for messageFlash in messagesFlash %}
+                {% if keyFlash == 'log' %}
+                    <div class="alert alert-success text-center">
+                        <p class="h3">{{ messageFlash }}</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <script type="text/javascript">
+        //Lancement du script
+        window.onload = function() 
+        {
+            //Met le focus sur le lecteur de code barre
+            document.getElementById('scan_scan').focus();
+            document.getElementById('scan_scan').value = '';        
+        } 
+    
+    </script>
+
 {% endblock %}

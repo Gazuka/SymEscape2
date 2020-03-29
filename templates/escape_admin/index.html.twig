@@ -26,6 +26,7 @@
                     <td>
                         {% for joueur in game.joueurs %}
                             {{ joueur.prenom }}
+                            {% if loop.last != true %} / {% endif %}
                         {% endfor %}
                     </td>
                     <td scope="col">

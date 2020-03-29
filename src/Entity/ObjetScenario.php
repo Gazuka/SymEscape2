@@ -33,6 +33,11 @@ class ObjetScenario
     private $nom;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Aide", mappedBy="objetScenario", cascade={"persist", "remove"})
+     */
+    private $aide;
+
+    /**
      * Retourne le seul objet possible
      *
      * @return void
@@ -42,6 +47,10 @@ class ObjetScenario
         if($this->bombe != null)
         {
             return $this->bombe;
+        }
+        if($this->aide != null)
+        {
+            return $this->aide;
         }
     }
 
@@ -87,6 +96,24 @@ class ObjetScenario
     public function setNom(string $nom): self
     {
         $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getAide(): ?Aide
+    {
+        return $this->aide;
+    }
+
+    public function setAide(?Aide $aide): self
+    {
+        $this->aide = $aide;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newObjetScenario = null === $aide ? null : $this;
+        if ($aide->getObjetScenario() !== $newObjetScenario) {
+            $aide->setObjetScenario($newObjetScenario);
+        }
 
         return $this;
     }

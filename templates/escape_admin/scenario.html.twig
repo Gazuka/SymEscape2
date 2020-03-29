@@ -1,0 +1,34 @@
+{% extends 'escape_admin/_base.html.twig' %}
+
+{% block title %}{{ parent() }} / Scénario : {{ scenario.titre }}{% endblock %}
+
+{% block content %}
+    <br/><h1 class="h3">Scénario : {{ scenario.titre }}</h1>
+
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">Etape</th>
+                <th scope="col">Descriptif</th>
+                <th scope="col">Indices</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for etape in scenario.etapes %}
+                <tr>
+                    <th>{{ etape.titre }}</th>
+                    <td>{{ etape.descriptif }}</td>
+                    <td>
+                        {% for indice in etape.indices %}
+                            {{ indice.descriptif }}
+                            {% if loop.last == false %}
+                                <br/>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+{% endblock %}

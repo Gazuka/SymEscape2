@@ -21,7 +21,15 @@ class JoueurType extends AbstractType
                     'Homme' => "m",
                     'Femme' => "f",
                 ]])
-            ->add('codeBarre')
+            ->add('codeBarre', ChoiceType::class, [
+                'choices' => [
+                    '020251' => "020251",
+                    '020252' => "020252",
+                    '020253' => "020253",
+                    '020254' => "020254",
+                    '020255' => "020255",
+                    '020256' => "020256",
+                ]])
         ;
     }
 

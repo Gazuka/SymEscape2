@@ -24,7 +24,7 @@
 {% endblock %}
 
 {# GESTION DES JOUEURS ################################################################################################################################################}
-{% block _game_edit_joueurs_widget %}
+{% block _game_edit_exam_joueurs_widget %}
     
     {{ form_widget(form) }}
 
@@ -35,11 +35,11 @@
     </div>
 {% endblock %}
 
-{% block _game_edit_joueurs_entry_row %}
+{% block _game_edit_exam_joueurs_entry_row %}
     {{ form_widget(form) }}
 {% endblock %}
 
-{% block _game_edit_joueurs_entry_widget %}
+{% block _game_edit_exam_joueurs_entry_widget %}
     <div class="form-group" id="block_{{id}}">
         <div class="card p-3">
             <div class="row">
@@ -64,13 +64,13 @@
             var index = +$('#widgets-counter').val();
             if(index==0)
             {
-                index = $('#game_edit_joueurs div.form-group').length;
+                index = $('#game_edit_exam_joueurs div.form-group').length;
                 $('#widgets-counter').val(index);
             }       
             // Je récupère le prototype des entrées
-            const tmpl = $('#game_edit_joueurs').data('prototype').replace(/__name__/g, index);
+            const tmpl = $('#game_edit_exam_joueurs').data('prototype').replace(/__name__/g, index);
             // J'injecte ce code au sein de la div
-            $('#game_edit_joueurs').append(tmpl);
+            $('#game_edit_exam_joueurs').append(tmpl);
             $('#widgets-counter').val(index + 1);
             // Je gère le bouton supprimer
             handleDeleteButtons();

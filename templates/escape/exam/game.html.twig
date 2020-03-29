@@ -1,33 +1,75 @@
-{% extends '_base.html.twig' %}
+{% extends 'escape/exam/_baseexam.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('bombe/style.css') }}"/>
-    <link href="https://fonts.googleapis.com/css?family=Oxygen+Mono&display=swap" rel="stylesheet">
+    {{ parent() }}
+   <link rel="stylesheet" href="{{ asset('css/exam_bombe.css') }}"/>
+   <link href="https://fonts.googleapis.com/css?family=Oxygen+Mono&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block meta %}
     <meta http-equiv="refresh" content="30;url={{ path('escape_exam', {'id' : game.id}) }}" />
-    
 {% endblock %}
 
-{% block title %}Exam en cours{% endblock %}
+{% block title %}{{ parent() }} - En cours{% endblock %}
 
-{% block body %}
+{% block content %}
+    {% set bombe = game.rechercheObjetScenario('bombe') %}
+    {% set aide = game.rechercheObjetScenario('aide') %}
+
+    <audio id="tictac" src={{ asset('exam/sons/tic.mp3') }}></audio>
+    <audio id="alarm" src={{ asset('exam/sons/alarm.mp3') }}></audio>
+
+    <div class="indices">
+
+        {% for keyFlash, messagesFlash in app.flashes %}
+            {% for messageFlash in messagesFlash %}
+                {% if keyFlash == 'messageIndice' %}
+                    <div class="alert alert-danger indice">{{ messageFlash }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        
+
+        {% for indice in aide.indices %}
+            {% if game.rechercheCommutEtape(indice.Etape).Etat == false %}
+                <div class="alert alert-success indice">{{ indice.descriptif }}</div>
+            {% endif %}
+        {% endfor %}
+        
+    </div>
     <div class="back1">
         &nbsp;   
     </div>
     <div id="bombe" class="bombe">
-        <div class="zone1">&nbsp;</div>
-        <div class="zone2">&nbsp;</div>            
-        <div class="zone3">
-            <div class="zone4" id="compte_a_rebours">88:88</div>
-            <div class="zone5">&nbsp;</div>
+        <div class="zone1">&nbsp;
+            <div class="icones">&nbsp;coucou
+                {% if bombe.pince %}
+                    <img src="{{ asset('exam/images/bombe/pince.jpg') }}"/>
+                {% endif %}
+            </div>
         </div>
-        <div class="zone6">&nbsp;</div>
+        <div class="zone1b">
+            <div class="zone2">
+                &nbsp; 
+            </div>
+            <div class="zone3">
+                <div class="zone4" id="compte_a_rebours">88:88</div>
+                <div class="zone5">
+                    &nbsp;
+                </div>
+            </div> 
+            <div class="zone6">
+                <div class="formscan">
+                    {{ form_start(form) }}
+                    {{ form_widget(form) }}    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>           
     </div>
     <div class="back2">&nbsp;</div>
+    
     <div class="back3">
-        {% set bombe = game.rechercheObjetScenario('bombe') %}
         {% if bombe.visRestantes > 0 %}
             {# couvercle de bombe #}
             <div class="back5">
@@ -56,14 +98,6 @@
         {% endif %}
     </div>
     
-    {% if bombe.pince %}
-        <img src="{{ asset('bombe/images/pince.jpg') }}"/>
-    {% endif %}
-
-    {{ form_start(form) }}
-    {{ form_widget(form) }}    
-    {{ form_end(form) }}            
-
     <script type="text/javascript">
         
         //Affichage de l'horloge + relance de la fonction tic tac toute les secondes
@@ -84,11 +118,21 @@
         //Calcul les minutes et secondes
         function tictac(duree)
         {
+            //Bruit du tic tac
+            var tictac = document.getElementById('tictac');
+                tictac.play();
+            //Calcul du temps
             var minutes = Math.trunc(duree / 60);
             var secondes = Math.trunc(duree - (minutes * 60));
             if(minutes <= 0 && secondes <= 0)
             {
                 window.location.reload();
+            }
+            //Si il reste moins de 5 minutes on déclanche l'alarme
+            if(minutes <= 5)
+            {
+                var alarm = document.getElementById('alarm');
+                alarm.play();   
             }
             minuteur(duree, minutes, secondes);
         } 

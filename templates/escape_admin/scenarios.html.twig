@@ -1,0 +1,26 @@
+{% extends 'escape_admin/_base.html.twig' %}
+
+{% block title %}{{ parent() }} / Scénarios{% endblock %}
+
+{% block content %}
+    <br/><h1 class="h3">Liste des scénarios :</h1>
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Scénario</th>
+                <th scope="col">Editer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for scenario in scenarios %}
+                <tr>
+                    <th>{{ scenario.id }}</th>
+                    <td><a href="{{ path('escape_admin_scenario', {'id' : scenario.id}) }}">{{ scenario.titre }}</a></td>
+                    <td><a href="{{ path('escape_admin_scenario_edit', {'id' : scenario.id}) }}"><i class="fas fa-cogs"></i></a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+{% endblock %}

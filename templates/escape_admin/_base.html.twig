@@ -2,6 +2,11 @@
 
 {% block title %}{{ parent() }} Admin{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }} ">
+{% endblock %}
+
 {% block body %}
     <div class="container-fluid">
         <div class="row">

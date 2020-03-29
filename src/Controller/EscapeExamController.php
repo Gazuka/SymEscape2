@@ -13,6 +13,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 //Nombre de minutes entre le début de la partie et le déclenchement de la bombe
 define("MINUTES_INTRO", "1");
+define("CODEBARRE_ADMIN", "020312");
+define("CODEBARRE_TOURNEVIS_1", "020312");
+define("CODEBARRE_TOURNEVIS_2", "020310");
+define("CODEBARRE_PINCE_1", "020311");
+define("CODEBARRE_PINCE_2", "020309");
+define("CODEBARRE_VISITEUR_1", "020251");
+define("CODEBARRE_VISITEUR_2", "020252");
+define("CODEBARRE_VISITEUR_3", "020253");
+define("CODEBARRE_VISITEUR_4", "020254");
+define("CODEBARRE_VISITEUR_5", "020255");
+define("CODEBARRE_VISITEUR_6", "020256");
 
 class EscapeExamController extends EscapeController
 {
@@ -44,8 +55,14 @@ class EscapeExamController extends EscapeController
         //Si la partie n'est pas démarré
         if($game->etatCommut('StartGame') != true)
         {
+            $formsLogJoueurs = $this->createForm(ScanType::class);        
+            $formsLogJoueurs->handleRequest($request);
             //Affichage de la page de lancement de la partie
+            $this->defineParamTwig("form", $formsLogJoueurs->createView());
             $this->defineTwig('escape/exam/pregame.html.twig');
+
+            //On regarde qui essaye de se logguer
+            $game = $this->LogJoueur($game, $this->Scan($formsLogJoueurs));
         }
         else
         {
@@ -146,21 +163,6 @@ class EscapeExamController extends EscapeController
     }
 
     /**
-     * @Route("/escape/exam/{id}/start", name="escape_exam_start")
-     * 
-     * Page qui démarre simplement la partie puis se redirige vers la page du jeu
-     */
-    public function gameStart($id, GameRepository $repo, EntityManagerInterface $manager)
-    {
-        $game = $repo->find($id);
-        $game->debuter();
-        $game->onCommut('StartGame');
-        $manager->persist($game);
-        $manager->flush();
-        return $this->redirectToRoute('escape_exam', ['id' => $game->getId()]);
-    }
-
-    /**
      * @Route("/escape/exam/{id}/coupe/{cutId}", name="escape_exam_cut")
      */
     public function gameCut($id, $cutId, GameRepository $repo, FilRepository $repoFil, EntityManagerInterface $manager)
@@ -216,14 +218,16 @@ class EscapeExamController extends EscapeController
     {
         //On récupère la bombe
         $bombe = $game->rechercheObjetScenario('bombe');
+        //On récupère l'aide
+        $aide = $game->rechercheObjetScenario('aide');
 
         //Action a effectuer selon le code barre
         $code = $this->Scan($form);
         switch($code)
         {
             //Code barre du tournevis
-            case '020312':
-            case '020310':
+            case CODEBARRE_TOURNEVIS_1:
+            case CODEBARRE_TOURNEVIS_2:
                 $bombe->devisser();
                 if($bombe->VisRestantes() == 0)
                 {
@@ -231,15 +235,67 @@ class EscapeExamController extends EscapeController
                 }
             break;
             //Code barre de la pince
-            case '020311':
-            case '020309':
+            case CODEBARRE_PINCE_1:
+            case CODEBARRE_PINCE_2:
                 $bombe->setPince(1);
                 $game->onCommut('PinceActive');
+            break;
+            //Code barre des badges
+            case CODEBARRE_VISITEUR_1:
+            case CODEBARRE_VISITEUR_2:
+            case CODEBARRE_VISITEUR_3:
+            case CODEBARRE_VISITEUR_4:
+            case CODEBARRE_VISITEUR_5:
+            case CODEBARRE_VISITEUR_6:
+                //Affiche un message Flash
+                $this->addFlash('messageIndice', $aide->demanderIndice($code));
             break;
             case null:
             break;           
         }
         return $game;
+    }
+
+    private function LogJoueur($game, $codeBarre)
+    {
+        $joueurs = $game->getJoueurs();
+        $nbrJoueursPrets = 0;
+        $nbrJoueurs = sizeof($joueurs);
+        $numTable = ['1', '4', '5', '2', '6', '3'];
+
+        foreach($joueurs as $joueur)
+        {
+            if($joueur->getEtat() == "pret")
+            {
+                $nbrJoueursPrets = $nbrJoueursPrets + 1;
+            }
+        }
+
+        if($nbrJoueursPrets < $nbrJoueurs)
+        {
+            foreach($joueurs as $joueur)
+            {
+                if($joueur->getCodeBarre() == $codeBarre)
+                {
+                    $joueur->setEtat('pret');
+                    $this->addFlash('log', $joueur->getPrenom()." installez vous à la table n° ".$numTable[$nbrJoueursPrets]." !");
+                }
+            }
+            if($nbrJoueursPrets == $nbrJoueurs)
+            {
+                $this->OnCommut('JoueursPrets');
+            }
+        }
+        else
+        {
+            //Lancement de la partie par l'admin
+            if($codeBarre == CODEBARRE_ADMIN)
+            {
+                $game->debuter();
+                $game->onCommut('StartGame');
+            }
+        }
+       return $game; 
     }
 
     /****************************************************************************************/

@@ -1,18 +1,34 @@
-{% extends '_base.html.twig' %}
+{% extends 'escape/exam/_baseexam.html.twig' %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('bombe/style.css') }}"/>
-    <link href="https://fonts.googleapis.com/css?family=Oxygen+Mono&display=swap" rel="stylesheet">
-{% endblock %}
+{% block title %}{{parent()}} / Fin{% endblock %}
 
-{% block meta %}
-    
-{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <div class="jumbotron">
+            <h1 class="display-4">
+                L'exam est fini :
+                {% if game.etatCommut('DesamorcageReussi') == true %}
+                    Félicitations !
+                {% else %}
+                    Raté...
+                {% endif %}
+            </h1>
+            {% if game.etatCommut('Boum') == true %}
+                <p class="lead">Vous n'avez pas trouvé le moyen de désamorcer la bombe dans le temps imparti...</p>
+            {% endif %}
+            {% if game.etatCommut('DesamorcageRate') == true %}
+                <p class="lead">Un conseil n'essayez pas de vous reconvertir en démineur...</p>
+            {% endif %}
+            {% if game.etatCommut('DesamorcageReussi') == true %}
+                <p class="lead">Vous avez réussi la première étape de notre test de recrutement, vous serez recontacté rapidement...</p>
+            {% endif %}
+            {# Messsage si enfermé dans le bouker... #}
+            <hr class="my-4">
+            <p>En aucun cas vous ne devez divulguer le contenu réel de ce test.</p>
+            <p>En cas de manquement a cette règle la sanction pourrait être fatale...</p>
+        </div>
+    </div>
 
-{% block title %}Exam fini{% endblock %}
-
-{% block body %}
-    <p>La partie est fini</p>
     {#
     {% for trigg in game.scenario.triggs %}
         {% if trigg.titre == "DesamorcageReussi" and trigg.etat == true %}
@@ -26,5 +42,4 @@
         {% endif %}
     {% endfor %}
     #}
-
 {% endblock %}
