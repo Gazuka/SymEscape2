@@ -24,22 +24,101 @@
             {% endif %}
             {# Messsage si enfermé dans le bouker... #}
             <hr class="my-4">
+            <p>Vous avez utilisé <strong>{{ game.rechercheObjetScenario('aide').indices | length}}</strong> indices.</p>
             <p>En aucun cas vous ne devez divulguer le contenu réel de ce test.</p>
-            <p>En cas de manquement a cette règle la sanction pourrait être fatale...</p>
+            <p>En cas de manquement à cette règle la sanction pourrait être fatale...</p>
+        </div>
+        <div class="alert alert-secondary" role="alert">
+            <h1 class="display-4">Statistiques :</h1>
+            {% set participants = stats['rate'] + stats['reussi'] + stats['boum'] + stats['sas'] + stats['lache'] %}
+            {% set pourcent_rate = stats['rate'] * 100 / participants %}
+            {% set pourcent_reussi = stats['reussi'] * 100 / participants %}
+            {% set pourcent_boum = stats['boum'] * 100 / participants %}
+            {% set pourcent_sas = stats['sas'] * 100 / participants %}
+            {% set pourcent_lache = stats['lache'] * 100 / participants %}
+
+            <div class="alert alert-light" role="alert">
+                <div class="row">
+                    <div class="col-12">
+                        <p>
+                            <strong>Candidats ayant réussi à désamorcer la bombe :</strong>
+                            {% for joueur in game.joueurs %}{% if joueur.etat == 'reussi' %}<span class="badge badge-success">{{ joueur.prenom }}</span> {% endif %}{% endfor %}
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{pourcent_reussi | round}}%;" aria-valuenow="{{pourcent_reussi | round}}" aria-valuemin="0" aria-valuemax="100">{{pourcent_reussi | round}}%</div>
+                        </div>
+                    </div>  
+                </div> 
+            </div>
+
+            <div class="alert alert-light" role="alert">
+                <div class="row">
+                    <div class="col-12">
+                        <p>
+                            <strong>Candidats s'étant réfugiés dans la panic room :</strong>
+                            {% for joueur in game.joueurs %}{% if joueur.etat == 'sas' %}<span class="badge badge-primary">{{ joueur.prenom }}</span> {% endif %}{% endfor %}
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-primary" role="progressbar" style="width: {{pourcent_sas | round}}%;" aria-valuenow="{{pourcent_sas | round}}" aria-valuemin="0" aria-valuemax="100">{{pourcent_sas | round}}%</div>
+                        </div>
+                    </div>  
+                </div> 
+            </div>
+
+            <div class="alert alert-light" role="alert">
+                <div class="row">
+                    <div class="col-12">
+                        <p>
+                            <strong>Candidats ayant abandonné le test :</strong>
+                            {% for joueur in game.joueurs %}{% if joueur.etat == 'lache' %}<span class="badge badge-warning">{{ joueur.prenom }}</span> {% endif %}{% endfor %}
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: {{pourcent_lache | round}}%;" aria-valuenow="{{pourcent_lache | round}}" aria-valuemin="0" aria-valuemax="100">{{pourcent_lache | round}}%</div>
+                        </div>
+                    </div>  
+                </div> 
+            </div>
+
+            <div class="alert alert-light" role="alert">
+                <div class="row">
+                    <div class="col-12">
+                        <p>
+                            <strong>Candidats ayant raté le désamorçage :</strong>
+                            {% for joueur in game.joueurs %}{% if joueur.etat == 'rate' %}<span class="badge badge-danger">{{ joueur.prenom }}</span> {% endif %}{% endfor %}
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: {{pourcent_rate | round}}%;" aria-valuenow="{{pourcent_rate | round}}" aria-valuemin="0" aria-valuemax="100">{{pourcent_rate | round}}%</div>
+                        </div>
+                    </div>  
+                </div> 
+            </div>
+
+            <div class="alert alert-light" role="alert">
+                <div class="row">
+                    <div class="col-12">
+                        <p>
+                            <strong>Candidats ayant laissé la bombe exploser :</strong>
+                            {% for joueur in game.joueurs %}{% if joueur.etat == 'boum' %}<span class="badge badge-dark">{{ joueur.prenom }}</span> {% endif %}{% endfor %}
+                        </p>
+                    </div>
+                    <div class="col-12">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped bg-dark" role="progressbar" style="width: {{pourcent_boum | round}}%;" aria-valuenow="{{pourcent_boum | round}}" aria-valuemin="0" aria-valuemax="100">{{pourcent_boum | round}}%</div>
+                        </div>
+                    </div>  
+                </div> 
+            </div>
+
+            <p class="text-center">Candidats retenus : {{stats['reussi']}} - Candidats éliminés : {{stats['rate'] + stats['boum'] + stats['sas'] + stats['lache']}} - Candidats morts : {{stats['rate'] + stats['boum']}} - Candidats ayant survécu : {{stats['reussi'] + stats['sas'] + stats['lache']}}</p>
+
         </div>
     </div>
-
-    {#
-    {% for trigg in game.scenario.triggs %}
-        {% if trigg.titre == "DesamorcageReussi" and trigg.etat == true %}
-            <h1>Félicitation, vous avez réussi à désamorcer la bombe !</h1>        
-        {% endif %}
-        {% if trigg.titre == "DesamorcageRate" and trigg.etat == true %}
-            <h1>Vous avez coupé le mauvais fil...</h1>        
-        {% endif %}
-        {% if trigg.titre == "Boum" and trigg.etat == true %}
-            <h1>Vous avez mis trop de temps, la bombe a explosé.</h1>        
-        {% endif %}
-    {% endfor %}
-    #}
 {% endblock %}

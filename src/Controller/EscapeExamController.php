@@ -6,6 +6,7 @@ use App\Form\ScanType;
 use App\Repository\FilRepository;
 use App\Repository\GameRepository;
 use App\Controller\EscapeController;
+use App\Repository\JoueurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,7 +37,7 @@ class EscapeExamController extends EscapeController
      * 
      * La page qui gère la partie en cours
      */
-    public function exam($id, GameRepository $repo, Request $request, EntityManagerInterface $manager)
+    public function exam($id, GameRepository $repo, JoueurRepository $repoJoueur, Request $request, EntityManagerInterface $manager)
     {
         //Création d'un formulaire pour l'utilisation du scanner
         $form = $this->createForm(ScanType::class);        
@@ -143,10 +144,12 @@ class EscapeExamController extends EscapeController
 
                             //On déclare la fin de partie
                             $game->onCommut('FinGame'); 
+                            $game = $this->EtatJoueursFindePartie($game);
                         }
                         else
                         {
                             //Ecran de fin
+                            $game = $this->calculStats($game, $repoJoueur);
                             $this->defineTwig('escape/exam/fin.html.twig');
                         }
                     }
@@ -206,6 +209,76 @@ class EscapeExamController extends EscapeController
     /****************************************************************************************/
     /*** FONCTIONS SPECIFIQUES **************************************************************/
     /****************************************************************************************/
+
+    /**
+     * Affiche les stats sur la page de fin
+     *
+     * @param [type] $game
+     * @return void
+     */
+    private function calculStats($game, $repoJoueur)
+    {
+        $joueurs = $repoJoueur->findAll();
+        $stats = [];
+        $stats['rate'] = 0;
+        $stats['reussi'] = 0;
+        $stats['boum'] = 0;
+        $stats['sas'] = 0;
+        $stats['lache'] = 0;
+
+        foreach($joueurs as $joueur)
+        {
+            if($joueur->getGame()->getScenario()->getCode() == "exam")
+            {
+                $etat = $joueur->getEtat();
+                switch($etat)
+                {
+                    case 'rate':
+                    case 'reussi':
+                    case 'boum':
+                    case 'sas':
+                    case 'lache':
+                        $stats[$etat] = $stats[$etat] + 1;
+                    break;
+                }
+            }
+        }
+        $this->defineParamTwig("stats", $stats);
+        return $game;
+    }
+
+    /**
+     * Permet de donner un état automatiquement à chacun des joueurs en fin de partie
+     *
+     * @param [type] $game
+     * @return void
+     */
+    private function EtatJoueursFindePartie($game)
+    {
+        $joueurs = $game->getJoueurs();
+        if($game->etatCommut('DesamorcageRate'))
+        {
+            foreach($joueurs as $joueur)
+            {
+                $joueur->setEtat('rate');
+            }
+        }
+        if($game->etatCommut('DesamorcageReussi'))
+        {
+            foreach($joueurs as $joueur)
+            {
+                $joueur->setEtat('reussi');
+            }
+        }
+        if($game->etatCommut('Boum'))
+        {
+            foreach($joueurs as $joueur)
+            {
+                $joueur->setEtat('boum');
+            }
+        }
+        return $game;
+    }
 
     /**
      * Choisi les actions à faire en fonction du scan par code barre
