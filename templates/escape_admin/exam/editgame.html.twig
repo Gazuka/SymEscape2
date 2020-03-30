@@ -1,23 +1,41 @@
 {% extends 'escape_admin/_base.html.twig' %}
 
-{% block title %}{{ parent() }} / Création d'une partie{% endblock %}
+{% block title %}{{ parent() }} / Edition d'une partie{% endblock %}
 
 {% form_theme form _self %}
 
 {% block content %}
     <h1>{{ titre }}</h1>
+    
+    {{ form_start(form) }}
 
-        {{ form_start(form) }}
-        {% for objet in element.objetsScenario %}
-            {% if objet.bombe != null %}
-                Durée de la bombe (en minutes) :
-                {{ form_widget(form.duree, {value: objet.bombe.duration / 60}) }}
-            {% endif %}
-        {% endfor %}
-        {{ form_widget(form) }}
-        
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-light">
+                {% for objet in element.objetsScenario %}
+                    {% if objet.bombe != null %}
+                        Durée de la bombe (en minutes) :
+                        {{ form_widget(form.duree, {value: objet.bombe.duration / 60}) }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-light">
+               {{ form_row(form.joueurs) }}
+            </div>
+        </div>
+    </div>
 
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <div class="alert alert-success clearfix">
+        <h2 class="alert-heading">Enregistrer les modifications</h2>
+        <p>Vous êtes sur le point de modifier la partie !</p>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check"></i> Enregistrer
+        </button>
+    </div>
 
         {{ form_end(form) }}        
     </div>
@@ -25,10 +43,9 @@
 
 {# GESTION DES JOUEURS ################################################################################################################################################}
 {% block _game_edit_exam_joueurs_widget %}
-    
     {{ form_widget(form) }}
-
-<input type="hidden" id="widgets-counter" value="0">
+    
+    <input type="hidden" id="widgets-counter" value="0">
 
     <div class="form-group">
         <button type="button" id="add-joueur" class="btn btn-primary">Ajouter un joueur</button>
@@ -36,22 +53,20 @@
 {% endblock %}
 
 {% block _game_edit_exam_joueurs_entry_row %}
-    {{ form_widget(form) }}
+        <div class="col-2"> {{ form_widget(form) }}</div>
 {% endblock %}
 
 {% block _game_edit_exam_joueurs_entry_widget %}
-    <div class="form-group" id="block_{{id}}">
-        <div class="card p-3">
-            <div class="row">
-                <div class="col-11">
-                    {{ form_widget(form) }}
-                </div>                
-                <div class="col-1">
-                    <button type="button" data-action="delete" data-target="#block_{{id}}" class="btn btn-danger">X</button>
-                </div>
+    
+        <div class="form-group" id="block_{{id}}">
+            <div class="card p-3">
+                {{ form_row(form.prenom) }}
+                {{ form_row(form.codeBarre) }}
+                {{ form_row(form.age) }}
+                {{ form_row(form.sexe) }}
+                <button type="button" data-action="delete" data-target="#block_{{id}}" class="btn btn-danger">X</button>
             </div>
         </div>
-    </div>
 {% endblock %}
 
 {# GESTION DES JAVASCRIPTS ###################################################################################################################################################}
@@ -61,19 +76,26 @@
         $('#add-joueur').click(function()
         {
             // Je récupère le numéro des futurs champs à créer
-            var index = +$('#widgets-counter').val();
-            if(index==0)
+            if($('#widgets-counter').val() < 6) // 6 joueurs max
             {
-                index = $('#game_edit_exam_joueurs div.form-group').length;
-                $('#widgets-counter').val(index);
-            }       
-            // Je récupère le prototype des entrées
-            const tmpl = $('#game_edit_exam_joueurs').data('prototype').replace(/__name__/g, index);
-            // J'injecte ce code au sein de la div
-            $('#game_edit_exam_joueurs').append(tmpl);
-            $('#widgets-counter').val(index + 1);
-            // Je gère le bouton supprimer
-            handleDeleteButtons();
+                var index = +$('#widgets-counter').val();
+                if(index==0)
+                {
+                    index = $('#game_edit_exam_joueurs div.form-group').length;
+                    $('#widgets-counter').val(index);
+                }       
+                // Je récupère le prototype des entrées
+                const tmpl = $('#game_edit_exam_joueurs').data('prototype').replace(/__name__/g, index);
+                // J'injecte ce code au sein de la div
+                $('#game_edit_exam_joueurs').append(tmpl);
+                $('#widgets-counter').val(index + 1);
+                // Je gère le bouton supprimer
+                handleDeleteButtons();
+            }
+            else
+            {
+                alert("6 joueurs maximum dans la partie");
+            }
         });
 
         function handleDeleteButtons() {

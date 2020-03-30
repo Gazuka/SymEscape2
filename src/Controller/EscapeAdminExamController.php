@@ -60,6 +60,45 @@ class EscapeAdminExamController extends EscapeAdminController
         return $this->afficherFormulaire($variables, $options);
     }
 
+    /**
+     * @Route("/escape/admin/exam/control/etat/joueur/{id}/{etat}/{idjoueur}", name="escape_admin_exam_control_etat_joueur")
+     * Modification de l'état d'un joueur
+     */
+    public function editEtatJoueur($id, $etat, $idjoueur, GameRepository $repo, EntityManagerInterface $manager)
+    {
+        $game = $repo->find($id);
+        foreach($game->getJoueurs() as $joueur)
+        {
+            if($joueur->getId() == $idjoueur)
+            {
+                if($etat != 'auto')
+                {
+                    $joueur->setEtat($etat);
+                }
+                else
+                {
+                    if($game->etatCommut('DesamorcageReussi') == true)
+                    {
+                        $joueur->setEtat('reussi'); 
+                    }
+                    if($game->etatCommut('DesamorcageRate') == true)
+                    {
+                        $joueur->setEtat('rate'); 
+                    }
+                    if($game->etatCommut('Boum') == true)
+                    {
+                        $joueur->setEtat('boum'); 
+                    }
+                }
+                
+            }
+        }
+        
+        $manager->persist($game);
+        $manager->flush();
+        return $this->redirectToRoute('escape_admin_control', ['id' => $game->getId()]);
+    }
+
     //-----------------------------------------------------------------------------------
     // ACTIONS A UTILIERS LORS DE LA VALIDATION D'UN FORMULAIRE =========================
     //-----------------------------------------------------------------------------------
@@ -101,7 +140,7 @@ class EscapeAdminExamController extends EscapeAdminController
             //Permet d'éditer la durée de la bombe
             if($objet->getBombe() != null)
             {
-                $duree = $request->request->get('game_edit')['duree'];
+                $duree = $request->request->get('game_edit_exam')['duree'];
                 if($duree != null)
                 {
                     $objet->getBombe()->setDuration($duree*60);

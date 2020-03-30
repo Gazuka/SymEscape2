@@ -49,6 +49,11 @@ class Bombe
      */
     private $objetScenario;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $dureeFin;
+
     public function __construct()
     {
         $this->fils = new ArrayCollection();
@@ -425,5 +430,17 @@ class Bombe
         $DureeDeLaBombe = $this->duration;
         $DureeRestante = $DureeDeLaBombe - $DureeEcoule;        
         return $DureeRestante;
+    }
+
+    public function getDureeFin(): ?int
+    {
+        return $this->dureeFin;
+    }
+
+    public function setDureeFin(?int $dureeFin): self
+    {
+        $this->dureeFin = $dureeFin;
+
+        return $this;
     }
 }

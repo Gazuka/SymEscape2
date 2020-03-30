@@ -8,27 +8,42 @@
 
 {% block content %}
     <h1>Partie : {{ game.id }}</h1>
-    <p>Prochaines actions à effectuer :</p>
-     {% for commutDeblocable in commutsDeblocables %}
-        {% if commutDeblocable.etape.automatique == false %}
-            <div class="col-12 alert alert-success">
-                <div class="row">
-                    <div class="col-1 text-center">
-                        <a class="btn btn-danger" href={{ path('escape_admin_control_commuton', {'id' : game.id, 'commut' : commutDeblocable.etape.titre }) }}>Trouvé</a>
+    {% if game.etatCommut('FinGame') == false %}
+        <p>Prochaines actions à effectuer :</p>
+        {% for commutDeblocable in commutsDeblocables %}
+            {% if commutDeblocable.etape.automatique == false %}
+                <div class="col-12 alert alert-success">
+                    <div class="row">
+                        <div class="col-1 text-center">
+                            <a class="btn btn-danger" href={{ path('escape_admin_control_commuton', {'id' : game.id, 'commut' : commutDeblocable.etape.titre }) }}>Trouvé</a>
+                        </div>
+                        <div class="col-11">
+                            <strong>{{ commutDeblocable.etape.descriptif }}</strong>
+                        </div>                    
                     </div>
-                    <div class="col-11">
-                        <strong>{{ commutDeblocable.etape.descriptif }}</strong>
-                    </div>                    
+                </div>
+            {% else %}
+                {% if commutDeblocable.etape.titre != "Boum" and commutDeblocable.etape.titre != "FinGame" %}
+                    <div class="col-12 mb-2 alert alert-warning text-decoration-none">
+                        <div class="col-12">
+                            {{ commutDeblocable.etape.descriptif }}
+                        </div>
+                    </div>  
+                {% endif %}  
+            {% endif %}
+        {% endfor %}   
+    {% else %}
+        <p>La partie est finie, voulez vous changer l'état d'un joueur ?</p>
+        {% for joueur in game.joueurs %}
+            <div class="col-12 alert alert-danger">
+                <div class="row">
+                    <div class="col-1">{{ joueur.etat }}</div>
+                    <div class="col-8">{{ joueur.prenom }}</div>
+                    <div class="col-1"><a class="btn btn-danger" href={{ path('escape_admin_exam_control_etat_joueur', {'id' : game.id, 'idjoueur': joueur.id, 'etat' : 'auto' }) }}><i class="fas fa-bomb"></i> Dans la salle</a></div>
+                    <div class="col-1"><a class="btn btn-danger" href={{ path('escape_admin_exam_control_etat_joueur', {'id' : game.id, 'idjoueur': joueur.id, 'etat' : 'sas' }) }}><i class="fas fa-clinic-medical"></i> Dans le sas</a></div>
+                    <div class="col-1"><a class="btn btn-danger" href={{ path('escape_admin_exam_control_etat_joueur', {'id' : game.id, 'idjoueur': joueur.id, 'etat' : 'lache' }) }}><i class="fas fa-running"></i> Abandon</a></div>
                 </div>
             </div>
-        {% else %}
-            {% if commutDeblocable.etape.titre != "Boum" and commutDeblocable.etape.titre != "FinGame" %}
-                <div class="col-12 mb-2 alert alert-warning text-decoration-none">
-                    <div class="col-12">
-                        {{ commutDeblocable.etape.descriptif }}
-                    </div>
-                </div>  
-            {% endif %}  
-        {% endif %}
-     {% endfor %}   
+        {% endfor %}
+    {% endif %}
 {% endblock %}

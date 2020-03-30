@@ -4,11 +4,17 @@
 
 {% block content %}
     <div class="container-fluid">
-        <div class="jumbotron">
+        <div class="jumbotron pb-1">
             <h1 class="display-4">
                 L'exam est fini :
                 {% if game.etatCommut('DesamorcageReussi') == true %}
-                    Félicitations !
+                    {% set bombe = game.rechercheObjetScenario('bombe') %}
+                    {% set minutes = (bombe.dureeFin - (bombe.dureeFin % 60)) / 60  %}
+                    {% set secondes = bombe.dureeFin - (minutes * 60) %}
+                    <h2>Félicitations ! Vous avez désamorcé la bombe 
+                    {% if minutes != 0 %}{{ minutes }} {% if minutes > 1 %} minutes {% else %} minute {% endif %} et {% endif %}
+                    {{ secondes }} {% if secondes > 1 %} secondes {% else %} seconde {% endif %}
+                    avant qu'elle n'explose.</h2>
                 {% else %}
                     Raté...
                 {% endif %}

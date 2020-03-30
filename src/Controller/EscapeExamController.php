@@ -197,6 +197,7 @@ class EscapeExamController extends EscapeController
             else
             {
                 //Gagné - On coupe le dernier fil est c'est gagné
+                $bombe->setDureeFin($bombe->calculDureeBombe());
                 $game->onCommut('DesamorcageReussi');
             }
 

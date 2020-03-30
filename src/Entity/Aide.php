@@ -110,50 +110,60 @@ class Aide
 
     public function demanderIndice($codeBarre)
     {
-        if($this->nbrIndicesEnCours() <= 4 )
+        //Si les joueurs n'ont jamais demandé d'indice on leur explique le principe
+        if($this->objetScenario->getGame()->etatCommut('InfoIndice') == false)
         {
-            //Si chaque joueur a déjà fait une demande, on remet les demandes à zéro
-            if(sizeof($this->demandeurs) == sizeof($this->getObjetScenario()->getGame()->getJoueurs()))
-            {
-                $this->demandeurs = Array();
-            }
-    
-            //On vérifie si c'est la première demande du joueur
-            $nouveauDemandeur = true;
-            foreach($this->demandeurs as $demandeur)
-            {
-                if($demandeur == $codeBarre)
-                {
-                    $nouveauDemandeur = false;
-                }
-            }
-    
-            //Si le joueur n'a pas encore fait de demande, on lui donne un indice
-            if($nouveauDemandeur == true)
-            {
-                //On enregistre que le joueur a fait une demande d'aide
-                array_push($this->demandeurs, $codeBarre);
-                //On verifie qui est le demandeur
-                foreach($this->getObjetScenario()->getGame()->getJoueurs() as $joueur)
-                {
-                    if($joueur->getCodeBarre() == $codeBarre)
-                    {
-                        $this->message = $joueur->getPrenom()." a demandé un indice.";
-                    }
-                }
-                //On récupère le bon indice
-                $this->recupererIndiceSuivant();
-            }
-            else
-            {
-                //Sinon, on demande a un autre joueur de demander un indice
-                $this->message = "Vous avez déjà fait une demande d'indice, laissez un autre candidat le faire !";
-            }
+            $this->message = "A partir de maintenant, à chaque fois qu'un candidat scannera son badge d'accès, vous recevrez un indice. Mais attention, vous en subirez les conséquences...";
+            $this->objetScenario->getGame()->onCommut('InfoIndice');
+
         }
         else
         {
-            //Vous avez déjà 4 indices...
-            $this->message = "Vous avez déjà quelques indices, utilisez-les !";
+             if($this->nbrIndicesEnCours() <= 4 )
+            {
+                //Si chaque joueur a déjà fait une demande, on remet les demandes à zéro
+                if(sizeof($this->demandeurs) == sizeof($this->getObjetScenario()->getGame()->getJoueurs()))
+                {
+                    $this->demandeurs = Array();
+                }
+        
+                //On vérifie si c'est la première demande du joueur
+                $nouveauDemandeur = true;
+                foreach($this->demandeurs as $demandeur)
+                {
+                    if($demandeur == $codeBarre)
+                    {
+                        $nouveauDemandeur = false;
+                    }
+                }
+        
+                //Si le joueur n'a pas encore fait de demande, on lui donne un indice
+                if($nouveauDemandeur == true)
+                {
+                    //On enregistre que le joueur a fait une demande d'aide
+                    array_push($this->demandeurs, $codeBarre);
+                    //On verifie qui est le demandeur
+                    foreach($this->getObjetScenario()->getGame()->getJoueurs() as $joueur)
+                    {
+                        if($joueur->getCodeBarre() == $codeBarre)
+                        {
+                            $this->message = $joueur->getPrenom()." a demandé un indice.";
+                        }
+                    }
+                    //On récupère le bon indice
+                    $this->recupererIndiceSuivant();
+                }
+                else
+                {
+                    //Sinon, on demande a un autre joueur de demander un indice
+                    $this->message = "Vous avez déjà fait une demande d'indice, laissez un autre candidat le faire !";
+                }
+            }
+            else
+            {
+                //Vous avez déjà 4 indices...
+                $this->message = "Vous avez déjà quelques indices, utilisez-les !";
+            }
         }
         return $this->message;
     }
