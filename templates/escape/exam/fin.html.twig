@@ -112,12 +112,12 @@
                     <div class="col-12">
                         <p>
                             <strong>Candidats ayant laissé la bombe exploser :</strong>
-                            {% for joueur in game.joueurs %}{% if joueur.etat == 'boum' %}<span class="badge badge-dark">{{ joueur.prenom }}</span> {% endif %}{% endfor %}
+                            {% for joueur in game.joueurs %}{% if joueur.etat == 'boum' %}<span class="badge badge-danger">{{ joueur.prenom }}</span> {% endif %}{% endfor %}
                         </p>
                     </div>
                     <div class="col-12">
                         <div class="progress">
-                            <div class="progress-bar progress-bar-striped bg-dark" role="progressbar" style="width: {{pourcent_boum | round}}%;" aria-valuenow="{{pourcent_boum | round}}" aria-valuemin="0" aria-valuemax="100">{{pourcent_boum | round}}%</div>
+                            <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width: {{pourcent_boum | round}}%;" aria-valuenow="{{pourcent_boum | round}}" aria-valuemin="0" aria-valuemax="100">{{pourcent_boum | round}}%</div>
                         </div>
                     </div>  
                 </div> 
