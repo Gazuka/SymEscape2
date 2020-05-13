@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 //Nombre de minutes entre le début de la partie et le déclenchement de la bombe
 define("MINUTES_INTRO", "1");
-define("CODEBARRE_ADMIN", "020312");
+define("CODEBARRE_ADMIN", "020390");
 define("CODEBARRE_TOURNEVIS_1", "020312");
 define("CODEBARRE_TOURNEVIS_2", "020310");
 define("CODEBARRE_PINCE_1", "020311");
