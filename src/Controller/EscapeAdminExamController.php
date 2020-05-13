@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Fil;
-use App\Entity\Vis;
+use App\Entity\Boulon;
 use App\Entity\Aide;
 use App\Entity\Bombe;
 use App\Entity\Scenario;
@@ -170,12 +170,12 @@ class EscapeAdminExamController extends EscapeAdminController
             $fil->setEtat(true);
             $bombe->addFil($fil);
         }
-        //Création des 4 vis
+        //Création des 4 boulons
         for($i=1; $i<=4; $i++)
         {
-            $vis = new Vis();
-            $vis->setEtat(true);
-            $bombe->addVi($vis);
+            $boulon = new Boulon();
+            $boulon->setEtat(true);
+            $bombe->addBoulon($boulon);
         }
         //Durée par défaut à 1h30
         $bombe->setDuration(90*60);
@@ -206,9 +206,9 @@ class EscapeAdminExamController extends EscapeAdminController
          $etapes = $this->CreationEtape($etapes, "VisionageIntro", "Visualisation de la vidéo d'introduction", ['StartGame'], true);
           $etapes = $this->CreationEtape($etapes, "StartBombe", "Mise en route de la bombe", ['VisionageIntro'], true);
            $etapes = $this->CreationEtape($etapes, "PinceActive", "La pince est activé sur la bombe", ['StartBombe'], true);
-           $etapes = $this->CreationEtape($etapes, "VisSupprimees", "Les 4 vis sont retirées", ['StartBombe'], true);
-            $etapes = $this->CreationEtape($etapes, "DesamorcageRate", "Vous avez coupé le mauvais fil...", ['PinceActive', 'VisSupprimees'], true);
-            $etapes = $this->CreationEtape($etapes, "DesamorcageReussi", "Vous avez coupé le mauvais fil...", ['PinceActive', 'VisSupprimees'], true);
+           $etapes = $this->CreationEtape($etapes, "BoulonsSupprimees", "Les 4 boulons sont retirées", ['StartBombe'], true);
+            $etapes = $this->CreationEtape($etapes, "DesamorcageRate", "Vous avez coupé le mauvais fil...", ['PinceActive', 'BoulonsSupprimees'], true);
+            $etapes = $this->CreationEtape($etapes, "DesamorcageReussi", "Vous avez coupé le mauvais fil...", ['PinceActive', 'BoulonsSupprimees'], true);
            $etapes = $this->CreationEtape($etapes, "Boum", "Trop tard, la bombe a explosée", ['StartBombe'], true);
            $etapes = $this->CreationEtape($etapes, "FinGame", "La partie est fini", ['StartBombe'], true);
         

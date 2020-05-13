@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use App\Repository\BoulonRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\VisRepository")
+ * @ORM\Entity(repositoryClass=BoulonRepository::class)
  */
-class Vis
+class Boulon
 {
     /**
      * @ORM\Id()
@@ -22,7 +23,8 @@ class Vis
     private $etat;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Bombe", inversedBy="vis")
+     * @ORM\ManyToOne(targetEntity=Bombe::class, inversedBy="boulons")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $bombe;
 

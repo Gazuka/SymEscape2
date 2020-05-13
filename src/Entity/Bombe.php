@@ -35,11 +35,6 @@ class Bombe
     private $fils;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\vis", mappedBy="bombe", cascade={"persist", "remove"})
-     */
-    private $vis;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $pince;
@@ -54,10 +49,16 @@ class Bombe
      */
     private $dureeFin;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Boulon::class, mappedBy="bombe", cascade={"persist", "remove"})
+     */
+    private $boulons;
+
     public function __construct()
     {
         $this->fils = new ArrayCollection();
-        $this->vis = new ArrayCollection();
+        $this->boulons = new ArrayCollection();
+        $this->boulons = new ArrayCollection();
     }
 
     public function FilsRestants()
@@ -88,28 +89,28 @@ class Bombe
         return $nbr;
     }
 
-    public function VisRestantes()
+    public function BoulonsRestantes()
     {
-        $nbrVis = 0;
-        foreach($this->vis as $vis)
+        $nbrBoulons = 0;
+        foreach($this->boulons as $boulons)
         {
-            if($vis->getEtat() == true)
+            if($boulons->getEtat() == true)
             {
-                $nbrVis = $nbrVis + 1;
+                $nbrBoulons = $nbrBoulons + 1;
             }
         }
-        return $nbrVis;
+        return $nbrBoulons;
     }
 
     public function Devisser()
     {
-        if($this->VisRestantes() > 0)
+        if($this->BoulonsRestantes() > 0)
         {
-            foreach($this->vis as $vis)
+            foreach($this->boulons as $boulons)
             {
-                if($vis->getEtat() == true)
+                if($boulons->getEtat() == true)
                 {
-                    $vis->setEtat(false);
+                    $boulons->setEtat(false);
                     break;
                 }
             }
@@ -340,37 +341,6 @@ class Bombe
         return $this;
     }
 
-    /**
-     * @return Collection|vis[]
-     */
-    public function getVis(): Collection
-    {
-        return $this->vis;
-    }
-
-    public function addVi(vis $vi): self
-    {
-        if (!$this->vis->contains($vi)) {
-            $this->vis[] = $vi;
-            $vi->setBombe($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVi(vis $vi): self
-    {
-        if ($this->vis->contains($vi)) {
-            $this->vis->removeElement($vi);
-            // set the owning side to null (unless already changed)
-            if ($vi->getBombe() === $this) {
-                $vi->setBombe(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getPince(): ?bool
     {
         return $this->pince;
@@ -440,6 +410,37 @@ class Bombe
     public function setDureeFin(?int $dureeFin): self
     {
         $this->dureeFin = $dureeFin;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Boulon[]
+     */
+    public function getBoulons(): Collection
+    {
+        return $this->boulons;
+    }
+
+    public function addBoulon(Boulon $boulon): self
+    {
+        if (!$this->boulons->contains($boulon)) {
+            $this->boulons[] = $boulon;
+            $boulon->setBombe($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBoulon(Boulon $boulon): self
+    {
+        if ($this->boulons->contains($boulon)) {
+            $this->boulons->removeElement($boulon);
+            // set the owning side to null (unless already changed)
+            if ($boulon->getBombe() === $this) {
+                $boulon->setBombe(null);
+            }
+        }
 
         return $this;
     }

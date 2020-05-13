@@ -70,13 +70,13 @@
     <div class="back2">&nbsp;</div>
     
     <div class="back3">
-        {% if bombe.visRestantes > 0 %}
+        {% if bombe.boulonsRestantes > 0 %}
             {# couvercle de bombe #}
             <div class="back5">
-                <div class="vis1 {% if bombe.visRestantes > 0 %}visOn{% endif %}">&nbsp;</div>
-                <div class="vis2 {% if bombe.visRestantes > 1 %}visOn{% endif %}">&nbsp;</div>
-                <div class="vis3 {% if bombe.visRestantes > 2 %}visOn{% endif %}">&nbsp;</div>
-                <div class="vis4 {% if bombe.visRestantes > 3 %}visOn{% endif %}">&nbsp;</div>
+                <div class="boulons1 {% if bombe.boulonsRestantes > 0 %}boulonsOn{% endif %}">&nbsp;</div>
+                <div class="boulons2 {% if bombe.boulonsRestantes > 1 %}boulonsOn{% endif %}">&nbsp;</div>
+                <div class="boulons3 {% if bombe.boulonsRestantes > 2 %}boulonsOn{% endif %}">&nbsp;</div>
+                <div class="boulons4 {% if bombe.boulonsRestantes > 3 %}boulonsOn{% endif %}">&nbsp;</div>
             </div>
         {% else %}
             {# plus de couvercle de bombe #}

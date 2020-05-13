@@ -303,9 +303,9 @@ class EscapeExamController extends EscapeController
             case CODEBARRE_TOURNEVIS_1:
             case CODEBARRE_TOURNEVIS_2:
                 $bombe->devisser();
-                if($bombe->VisRestantes() == 0)
+                if($bombe->BoulonsRestantes() == 0)
                 {
-                    $game->onCommut('VisSupprimees'); 
+                    $game->onCommut('BoulonsSupprimees'); 
                 }
             break;
             //Code barre de la pince
