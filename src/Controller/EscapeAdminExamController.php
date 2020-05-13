@@ -201,6 +201,7 @@ class EscapeAdminExamController extends EscapeAdminController
         $etapes = Array();
 
         //Création des différents étapes automatiques du scenario
+        $etapes = $this->CreationEtape($etapes, "JoueursPrets", "Les jours sont installés", null, true);
         $etapes = $this->CreationEtape($etapes, "StartGame", "La partie est débuté", null, true);
          $etapes = $this->CreationEtape($etapes, "VisionageIntro", "Visualisation de la vidéo d'introduction", ['StartGame'], true);
           $etapes = $this->CreationEtape($etapes, "StartBombe", "Mise en route de la bombe", ['VisionageIntro'], true);
