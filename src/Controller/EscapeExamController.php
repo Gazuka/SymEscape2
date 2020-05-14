@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 //Nombre de minutes entre le début de la partie et le déclenchement de la bombe
-define("MINUTES_INTRO", "1");
+define("MINUTES_INTRO", "4");
 define("CODEBARRE_ADMIN", "020312");
 define("CODEBARRE_TOURNEVIS_1", "020312");
 define("CODEBARRE_TOURNEVIS_2", "020310");
